@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">ACE_Android</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_products">Products</string>
+    <string name="title_activity_hue_register">Register Your Hue</string>
+    <string name="title_activity_add_lights">Add Lights</string>
+    <string name="title_activity_hue_register_error">Error Registering Your Hue</string>
+    <string name="title_activity_more_lights">More Lights?</string>
+    <string name="title_activity_configure_lights">Configure Lights</string>
+    <string name="title_activity_flash_check">FlashCheck</string>
+    <string name="title_activity_color_check">Color Check</string>
+    <string name="title_activity_color_result">Color Result</string>
+</resources>
