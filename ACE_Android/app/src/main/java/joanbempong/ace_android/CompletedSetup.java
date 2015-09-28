@@ -66,7 +66,7 @@ public class CompletedSetup extends AppCompatActivity {
         @Override
         public void onClick(View arg0) {
             //navigate to the ACEHome page
-            //startActivity(new Intent(CompletedSetup.this, ACEHome.class));
+            startActivity(new Intent(CompletedSetup.this, Home.class));
         }
     };
 }

@@ -62,6 +62,14 @@
             android:name=".CompletedSetup"
             android:label="@string/title_activity_completed_setup" >
         </activity>
+        <activity
+            android:name=".Home"
+            android:label="@string/title_activity_home" >
+        </activity>
+        <activity
+            android:name=".Lights"
+            android:label="@string/title_activity_lights" >
+        </activity>
     </application>
 
 </manifest>

@@ -34,6 +34,10 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
     public static boolean HUEregistered = false; //is the Hue Bridge registered?
     public static boolean testFlash = false;
     public static boolean testColor = false;
+    public static boolean popup = false; //is a pop up window currently open?
+
+    public static Long len; //length of a sleep period
+    public static int lightNum; //which light?
 
     static String hueCommandOff = "{\"on\": false}";
     static String hueCommandOn = "{\"on\": true, \"bri\": 255}";
@@ -334,6 +338,42 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
     }
 
     //turns on the Hue
+    public static void putHueOn(int lightNum, int lightBright){
+        URL url;
+        String response = "";
+        hueCommandOn = String.format("{\"on\": true, \"bri\":%s}", lightBright);
+        try{
+            //creates a new url and client
+            url = new URL(String.format("http://%s/api/%s/lights/%s/state", DefaultHost, DefaultUsername, lightNum));
+            System.out.println(url);
+            HttpURLConnection client = (HttpURLConnection) url.openConnection();
+            client.setDoOutput(true);
+            client.setRequestMethod("PUT");
+
+            //writes to the bridge to turn off the LED bulb
+            OutputStreamWriter send = new OutputStreamWriter(client.getOutputStream());
+            send.write(hueCommandOn);
+            send.close();
+
+            //reads the message sent by the Hue Bridge
+            Scanner in = new Scanner(client.getInputStream());
+            while (in.hasNextLine()){
+                response += (in.nextLine());
+            }
+            System.out.println(response);
+            client.disconnect();
+        }
+        catch (NetworkOnMainThreadException e){
+            e.printStackTrace();
+            System.out.println("in network on main thread exception");
+        }
+        catch (IOException e){
+            System.out.println("in ioexception");
+            e.printStackTrace();
+        }
+    }
+
+    //turns on the Hue
     public static void putHueDefaultColor(int lightNum){
         URL url;
         String response = "";
@@ -371,14 +411,56 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
 
     //creates a new TestHueFlash object to flash the Hue
     //a new class is created to be able to flash and perform other task -- needs async task
-    public static void putHueFlashCheck(int lightNum){
-        HueFlash flash = new HueFlash(DefaultHost, DefaultUsername, lightNum);
+    public static void putHueFlash(int lightNum, long len){
+        HueFlash flash = new HueFlash(DefaultHost, DefaultUsername, lightNum, len);
         //runs FlashingHue doInBackground function
         flash.execute();
     }
 
 
-    public static void putHueColorCheck(int lightNum){
+    public static void putHueColor(int lightNum, String color, int brightness){
+        if (color.equals("red")){
+            color = String.format("{\"on\": true, \"bri\": %s, \"xy\": [0.7,0.2986]}", brightness);
+        }
+        else if (color.equals("orange")){
+            color = String.format("{\"on\": true, \"bri\": %s, \"xy\": [0.6,0.38]}", brightness);
+        }
+        else if (color.equals("yellow")){
+            color = String.format("{\"on\": true, \"bri\": %s, \"xy\": [0.5,0.41]}", brightness);
+
+        }
+        else if (color.equals("green")){
+            color = String.format("{\"on\": true, \"bri\": %s, \"xy\": [0.21,0.7]}", brightness);
+
+        }
+        else if (color.equals("blue")){
+            color = String.format("{\"on\": true, \"bri\": %s, \"xy\": [0.139,0.081]}", brightness);
+
+        }
+        else if (color.equals("purple")){
+            color = String.format("{\"on\": true, \"bri\": %s, \"xy\": [0.2651,0.1291]}", brightness);
+
+        }
+        else if (color.equals("pink")){
+            color  = String.format("{\"on\": true, \"bri\": %s, \"xy\": [0.5,0.23]}", brightness);
+
+        }
+        else if (color.equals("white")){
+            color  = String.format("{\"on\": true, \"bri\": %s, \"xy\": [0.3227,0.329]}", brightness);
+
+        }
+        else if (color.equals("daylight")){
+            color  = String.format("{\"on\": true, \"bri\": %s, \"xy\": [0.4947,0.35]}", brightness);
+
+        }
+        else if (color.equals("softwhite")){
+            color = String.format("{\"on\": true, \"bri\": %s, \"xy\": [0.3695,0.3584]}", brightness);
+
+        }
+        else if (color.equals("warmwhite")){
+            color = String.format("{\"on\": true, \"bri\": %s, \"xy\": [0.5104,0.3826]}", brightness);
+        }
+
         URL url;
         String response = "";
         try{
@@ -391,8 +473,8 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
 
             //writes to the bridge to turn off the LED bulb
             OutputStreamWriter send = new OutputStreamWriter(client.getOutputStream());
-            send.write(hueColorRed);
-            System.out.println(hueColorRed);
+            send.write(color);
+            System.out.println(color);
             send.close();
 
             //reads the message sent by the Hue Bridge
@@ -400,7 +482,7 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
             while (in.hasNextLine()){
                 response += (in.nextLine());
             }
-            System.out.println("in huecontroller puttesthuecolor");
+            System.out.println("in huecontroller puthuecolor");
             System.out.println(response);
             client.disconnect();
         }
@@ -561,6 +643,63 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
                             "\nMissed Call Flash Rate : " + contact.get(5)[1]);
                 }
             }
+        }
+    }
+
+    public static void simulateAnIncomingCall(CharSequence name){
+        String[] nameSplit = name.toString().split("\\s+");
+
+        if (Contacts.size() != 0){
+            for (List<String[]> contact: Contacts)
+                if (nameSplit[0].equals(contact.get(0)[0]) && nameSplit[1].equals(contact.get(0)[1])) {
+                    int lightVal = 0;
+                    while (lightVal != Lights.size()) {
+                        System.out.println(contact.get(2)[0]);
+                        System.out.println(Lights.get(lightVal)[3]);
+                        System.out.println(Lights.get(lightVal)[0]);
+                        if (contact.get(2)[0].equals(Lights.get(lightVal)[3])){
+                            lightNum = Integer.parseInt(Lights.get(lightVal)[0]);
+                            break;
+                        }
+                        lightVal++;
+                    }
+
+                    len = Long.parseLong(contact.get(3)[1]);
+
+                    //a pop up window is currently active
+                    popup = true;
+
+                    //when a button of the alert dialog has not been pressed, flash the Hue
+                    putHueFlash(lightNum, len);
+
+                }
+
+        }
+    }
+
+    public static void simulateAMissedCall(CharSequence name){
+        String[] nameSplit = name.toString().split("\\s+");
+
+        if (Contacts.size() != 0){
+            for (List<String[]> contact: Contacts)
+                if (nameSplit[0].equals(contact.get(0)[0]) && nameSplit[1].equals(contact.get(0)[1])) {
+                    int lightVal = 0;
+                    while (lightVal != Lights.size()) {
+                        System.out.println(contact.get(2)[0]);
+                        System.out.println(Lights.get(lightVal)[3]);
+                        System.out.println(Lights.get(lightVal)[0]);
+                        if (contact.get(4)[0].equals(Lights.get(lightVal)[3])){
+                            lightNum = Integer.parseInt(Lights.get(lightVal)[0]);
+                            break;
+                        }
+                        lightVal++;
+                    }
+
+                    //show the user there is a missed call
+                    putHueColor(lightNum, "red", 255);
+
+                }
+
         }
     }
 }

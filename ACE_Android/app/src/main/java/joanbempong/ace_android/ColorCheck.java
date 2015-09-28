@@ -42,7 +42,7 @@ public class ColorCheck extends AppCompatActivity {
                 lightNum = Integer.parseInt(HueController.Lights.get(lightList)[0]);
                 System.out.println("testing color");
                 HueController.putHueOff(lightNum);
-                HueController.putHueColorCheck(lightNum);
+                HueController.putHueColor(lightNum, "red", 255);
                 break;
             }
             lightList++;

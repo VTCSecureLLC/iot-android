@@ -17,13 +17,14 @@ public class HueFlash extends AsyncTask<Void, Void, Void> {
     public String host;
     public String username;
     public int lightNum;
-    public long sleep = 500;
+    public long sleep;
 
     //Constructor
-    HueFlash(String DefaultHost, String DefaultUsername, int light){
+    HueFlash(String DefaultHost, String DefaultUsername, int light, long len){
         host = DefaultHost;
         username = DefaultUsername;
         lightNum = light;
+        sleep = len;
     }
 
     //method required to perform async task -- runs in the background while there is a pop up window active
@@ -36,7 +37,7 @@ public class HueFlash extends AsyncTask<Void, Void, Void> {
         OutputStreamWriter send;
         Scanner in;
         try {
-            while (HueController.testFlash) {
+            while (HueController.testFlash || HueController.popup) {
                 response = "";
 
                 //creates a new url and client

@@ -52,7 +52,7 @@ public class FlashCheck extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                HueController.putHueFlashCheck(lightNum);
+                HueController.putHueFlash(lightNum, sleep);
                 break;
             }
             lightList++;
