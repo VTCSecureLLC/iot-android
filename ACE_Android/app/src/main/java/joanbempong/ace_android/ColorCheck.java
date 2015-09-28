@@ -1,9 +1,8 @@
 package joanbempong.ace_android;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,13 +20,13 @@ public class ColorCheck extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_color_check);
 
-        //connects the textviews and button to the widgets created in xml
+        //connects the textviews and buttons to the widgets created in xml
         lightName = (TextView)findViewById(R.id.lightName);
         bodyText = (TextView)findViewById(R.id.bodyText);
         yesBtn = (Button)findViewById(R.id.yesBtn);
         noBtn = (Button)findViewById(R.id.noBtn);
 
-        //creates an on click listener
+        //creates on click listeners
         yesBtn.setOnClickListener(yesBtnOnClickListener);
         noBtn.setOnClickListener(noBtnOnClickListener);
 
@@ -35,9 +34,7 @@ public class ColorCheck extends AppCompatActivity {
         lightName.setText(HueController.currentLightConfigure);
         bodyText.setText("Did the light turn red?");
 
-        //centers the text
-        bodyText.setGravity(Gravity.CENTER);
-
+        //test and see if the light supports color
         int lightList = 0;
         int lightNum;
         while (lightList != HueController.Lights.size()) {
@@ -45,7 +42,7 @@ public class ColorCheck extends AppCompatActivity {
                 lightNum = Integer.parseInt(HueController.Lights.get(lightList)[0]);
                 System.out.println("testing color");
                 HueController.putHueOff(lightNum);
-                HueController.putTestHueColor(lightNum);
+                HueController.putHueColorCheck(lightNum);
                 break;
             }
             lightList++;
@@ -78,7 +75,7 @@ public class ColorCheck extends AppCompatActivity {
     @Override
     public void onBackPressed()
     {
-        //navigate to the Products page
+        //navigate to the FlashCheck page
         startActivity(new Intent(ColorCheck.this, FlashCheck.class));
     }
 
@@ -145,7 +142,7 @@ public class ColorCheck extends AppCompatActivity {
                 }
             }
 
-            // navigate to the ColorResult class
+            // navigate to the ColorResult page
             startActivity(new Intent(ColorCheck.this, ColorResult.class));
         }
     };

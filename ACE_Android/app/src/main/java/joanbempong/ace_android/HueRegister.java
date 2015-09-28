@@ -3,7 +3,6 @@ package joanbempong.ace_android;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,8 +32,6 @@ public class HueRegister extends AppCompatActivity {
         bodyText.setText("Let's register your Hue Bridge");
         subBodyText.setText("press the link button on the bridge and hit next");
 
-        //centers the text
-        subBodyText.setGravity(Gravity.CENTER);
     }
 
     @Override
@@ -78,18 +75,20 @@ public class HueRegister extends AppCompatActivity {
                         //if result is true, navigate to the ConnectedActivity class
                         if (result) {
                             if (HueController.postHue()) {
+                                //the Hue has been registered
                                 HueController.HUEregistered = true;
 
-                                // navigate to the AddLights class
+                                // navigate to the MoreLights page
                                 startActivity(new Intent(HueRegister.this, MoreLights.class));
 
                             } else {
+                                // navigate to the HueRegisterError page
                                 startActivity(new Intent(HueRegister.this, HueRegisterError.class));
                             }
                         }
 
                         //if result is false, pop up a window letting the user know there is something wrong
-                        //currently does not work
+                        //currently does not work -- i don't think
                         else {
                             System.out.println("couldnt connect");
                         }
@@ -99,7 +98,7 @@ public class HueRegister extends AppCompatActivity {
                 HueController.controller.execute();
             }
             else{
-                // navigate to the AddLights class
+                // navigate to the MoreLights page
                 startActivity(new Intent(HueRegister.this, MoreLights.class));
             }
         }

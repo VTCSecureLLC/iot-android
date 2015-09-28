@@ -25,7 +25,7 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
     //some are static so that it can be accessed by other classes -- not sure if okay
     public static String DefaultHost = "192.168.0.102"; //ip address of the Hue Bridge
     public int DefaultPort = 80; //port used to connect to the Hue Bridge
-    public static String DefaultUsername = "HueAndroid"; //username for the Hue Bridge
+    public static String DefaultUsername = "ACEAndroid"; //username for the Hue Bridge
 
     public static Socket socket;
     private HueConnection hueConnection;
@@ -37,9 +37,23 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
 
     static String hueCommandOff = "{\"on\": false}";
     static String hueCommandOn = "{\"on\": true, \"bri\": 255}";
-    static String postCommand = "{\"username\": \"%s\", \"devicetype\": \"ACE Android Hue\"}, DefaultUsername)";
+    static String postCommand = String.format("{\"username\": \"%s\", \"devicetype\": \"ACE Android Hue\"}", DefaultUsername);
     static String linkError = "[{\"error\":{\"type\":101,\"address\":\"\",\"description\":\"link button not pressed\"}}]";
 
+    //Colors for Philips Hue
+    static String hueColorRed = "{\"on\": true, \"bri\": 255, \"xy\": [0.7,0.2986]}";
+    static String hueColorOrange = "{\"on\": true, \"bri\": 255, \"xy\": [0.6,0.38]}";
+    static String hueColorYellow = "{\"on\": true, \"bri\": 255, \"xy\": [0.5,0.41]}";
+    static String hueColorGreen = "{\"on\": true, \"bri\": 255, \"xy\": [0.21,0.7]}";
+    static String hueColorBlue = "{\"on\": true, \"bri\": 255, \"xy\": [0.139,0.081]}";
+    static String hueColorPurple = "{\"on\": true, \"bri\": 255, \"xy\": [0.2651,0.1291]}";
+    static String hueColorPink = "{\"on\": true, \"bri\": 255, \"xy\": [0.5,0.23]}";
+    static String hueColorWhite = "{\"on\": true, \"bri\": 255, \"xy\": [0.3227,0.329]}";
+    static String hueColorDaylight = "{\"on\": true, \"bri\": 255, \"xy\": [0.4947,0.35]}";
+    static String hueColorSoftWhite = "{\"on\": true, \"bri\": 255, \"xy\": [0.3695,0.3584]}";
+    static String hueColorWarmWhite = "{\"on\": true, \"bri\": 255, \"xy\": [0.5104,0.3826]}";
+
+    //List of connected lights
     public static List<String[]> Lights = new ArrayList<>();
     public static String[] Light;
     public static String LightState;
@@ -57,6 +71,24 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
     public static Integer[] wordsToLookForIndexes;
 
     public static String currentLightConfigure = "";
+
+    //Current contact list
+    public static List<List<String[]>> Contacts = new ArrayList<>();
+    public static List<String[]> Contact;
+    public static String[] ContactName;
+    public static String[] ContactPhoneNumber;
+    public static String[] ContactIncomingCallLight;
+    public static String[] ContactIncomingCallFlash;
+    public static String[] ContactMissedCallLight;
+    public static String[] ContactMissedCallFlash;
+
+    //default values for incoming and missed calls
+    public static String defaultIncomingLight, defaultIncomingFlashPattern, defaultIncomingFlashRate;
+    public static String defaultMissedLight, defaultMissedFlashPattern, defaultMissedFlashRate;
+
+    //old contact information
+    static String oldFirstName, oldLastName, oldPhoneNumber, oldIncomingCallLight, oldIncomingCallFlashPattern,
+            oldIncomingCallFlashRate, oldMissedCallLight, oldMissedCallFlashPattern, oldMissedCallFlashRate;
 
     //constructor
     public HueController(HueConnection hueConnection) {
@@ -301,11 +333,10 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
         }
     }
 
-    //turns in the Hue
-    public static void putHueColorOn(int lightNum){
+    //turns on the Hue
+    public static void putHueDefaultColor(int lightNum){
         URL url;
         String response = "";
-        String hueCommandOnColor = "{\"on\":true,\"bri\":255,\"sat\":255,\"xy\": [0.3, 0.3]}";
         try{
             //creates a new url and client
             url = new URL(String.format("http://%s/api/%s/lights/%s/state", DefaultHost, DefaultUsername, lightNum));
@@ -314,9 +345,9 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
             client.setDoOutput(true);
             client.setRequestMethod("PUT");
 
-            //writes to the bridge to turn off the LED bulb
+            //writes to the bridge to turn on the LED bulb
             OutputStreamWriter send = new OutputStreamWriter(client.getOutputStream());
-            send.write(hueCommandOnColor);
+            send.write(hueColorWarmWhite);
             send.close();
 
             //reads the message sent by the Hue Bridge
@@ -340,17 +371,16 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
 
     //creates a new TestHueFlash object to flash the Hue
     //a new class is created to be able to flash and perform other task -- needs async task
-    public static void putTestHueFlash(int lightNum){
-        TestHueFlash flash = new TestHueFlash(DefaultHost, DefaultUsername, lightNum);
+    public static void putHueFlashCheck(int lightNum){
+        HueFlash flash = new HueFlash(DefaultHost, DefaultUsername, lightNum);
         //runs FlashingHue doInBackground function
         flash.execute();
     }
 
 
-    public static void putTestHueColor(int lightNum){
+    public static void putHueColorCheck(int lightNum){
         URL url;
         String response = "";
-        String hueCommandOnColor = "{\"on\":true,\"bri\":255,\"sat\":255,\"xy\":[0.675,0.322]}";
         try{
             //creates a new url and client
             url = new URL(String.format("http://%s/api/%s/lights/%s/state", DefaultHost, DefaultUsername, lightNum));
@@ -361,8 +391,8 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
 
             //writes to the bridge to turn off the LED bulb
             OutputStreamWriter send = new OutputStreamWriter(client.getOutputStream());
-            send.write(hueCommandOnColor);
-            System.out.println(hueCommandOnColor);
+            send.write(hueColorRed);
+            System.out.println(hueColorRed);
             send.close();
 
             //reads the message sent by the Hue Bridge
@@ -384,6 +414,7 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
         }
     }
 
+    //are all of the connected Hue lights configured?
     public static boolean allLightsConfigured(){
         int lightList = 0;
         while (lightList != HueController.Lights.size()) {
@@ -393,5 +424,143 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
             lightList++;
         }
         return true;
+    }
+
+    //save default values for incoming calls
+    public static void defaultIncomingCall(String light, String flashPattern, String flashRate){
+        defaultIncomingLight = light;
+        defaultIncomingFlashPattern = flashPattern;
+        defaultIncomingFlashRate = flashRate;
+    }
+
+    //save default values for missed calls
+    public static void defaultMissedCall(String light, String flashPattern, String flashRate){
+        defaultMissedLight = light;
+        defaultMissedFlashPattern = flashPattern;
+        defaultMissedFlashRate = flashRate;
+    }
+
+    public static void newContact(String firstName, String lastName, String phoneNumber,
+                                  String incomingCallLight,
+                                  String incomingCallFlashPattern,
+                                  String incomingCallFlashRate,
+                                  String missedCallLight,
+                                  String missedCallFlashPattern,
+                                  String missedCallFlashRate){
+
+        ContactName = new String[2];
+        ContactName[0] = firstName;
+        ContactName[1] = lastName;
+
+        ContactPhoneNumber = new String[1];
+        ContactPhoneNumber[0] = phoneNumber;
+
+        ContactIncomingCallLight = new String[1];
+        ContactIncomingCallLight[0] = incomingCallLight;
+
+        ContactIncomingCallFlash = new String[2];
+        ContactIncomingCallFlash[0] = incomingCallFlashPattern;
+        ContactIncomingCallFlash[1] = incomingCallFlashRate;
+
+        ContactMissedCallLight = new String[1];
+        ContactMissedCallLight[0] = missedCallLight;
+
+        ContactMissedCallFlash = new String[2];
+        ContactMissedCallFlash[0] = missedCallFlashPattern;
+        ContactMissedCallFlash[1] = missedCallFlashRate;
+
+        //create a new contact
+        Contact = new ArrayList<>();
+        Contact.add(ContactName);
+        Contact.add(ContactPhoneNumber);
+        Contact.add(ContactIncomingCallLight);
+        Contact.add(ContactIncomingCallFlash);
+        Contact.add(ContactMissedCallLight);
+        Contact.add(ContactMissedCallFlash);
+
+        //add to the list of contacts
+        Contacts.add(Contact);
+
+        System.out.println("New Contact : " +
+                "\nFirst Name : " + Contact.get(0)[0] +
+                "\nLast Name : " + Contact.get(0)[1] +
+                "\nPhone Number : " + Contact.get(1)[0] +
+                "\nIncoming Call Light : " + Contact.get(2)[0] +
+                "\nIncoming Call Flash Pattern : " + Contact.get(3)[0] +
+                "\nIncoming Call Flash Rate : " + Contact.get(3)[1] +
+                "\nMissed Call Light : " + Contact.get(4)[0] +
+                "\nMissed Call Flash Pattern : " + Contact.get(5)[0] +
+                "\nMissed Call Flash Rate : " + Contact.get(5)[1]);
+    }
+
+    public static void saveCurrentInformation(String firstname, String lastname){
+        oldFirstName = firstname;
+        oldLastName = lastname;
+        for (List<String[]> contact : Contacts) {
+            if (contact.get(0)[0].equals(oldFirstName) && contact.get(0)[1].equals(oldLastName)) {
+                oldPhoneNumber = contact.get(1)[0];
+                oldIncomingCallLight = contact.get(2)[0];
+                oldIncomingCallFlashPattern = contact.get(3)[0];
+                oldIncomingCallFlashRate = contact.get(3)[1];
+                oldMissedCallLight = contact.get(4)[0];
+                oldMissedCallFlashPattern = contact.get(5)[0];
+                oldMissedCallFlashRate = contact.get(5)[1];
+            }
+        }
+    }
+
+    public static void editContact(String firstName, String lastName, String phoneNumber,
+                                   String incomingCallLight,
+                                   String incomingCallFlashPattern,
+                                   String incomingCallFlashRate,
+                                   String missedCallLight,
+                                   String missedCallFlashPattern,
+                                   String missedCallFlashRate){
+        //update the contact
+        if (Contacts != null) {
+            ContactName = new String[2];
+            ContactName[0] = firstName;
+            ContactName[1] = lastName;
+
+            ContactPhoneNumber = new String[1];
+            ContactPhoneNumber[0] = phoneNumber;
+
+            ContactIncomingCallLight = new String[1];
+            ContactIncomingCallLight[0] = incomingCallLight;
+
+            ContactIncomingCallFlash = new String[2];
+            ContactIncomingCallFlash[0] = incomingCallFlashPattern;
+            ContactIncomingCallFlash[1] = incomingCallFlashRate;
+
+            ContactMissedCallLight = new String[1];
+            ContactMissedCallLight[0] = missedCallLight;
+
+            ContactMissedCallFlash = new String[2];
+            ContactMissedCallFlash[0] = missedCallFlashPattern;
+            ContactMissedCallFlash[1] = missedCallFlashRate;
+
+
+            for (List<String[]> contact : Contacts) {
+                if (contact.get(0)[0].equals(oldFirstName) && contact.get(0)[1].equals(oldLastName)) {
+                    contact.set(0, ContactName);
+                    contact.set(1, ContactPhoneNumber);
+                    contact.set(2, ContactIncomingCallLight);
+                    contact.set(3, ContactIncomingCallFlash);
+                    contact.set(4, ContactMissedCallLight);
+                    contact.set(5, ContactMissedCallFlash);
+
+                    System.out.println("Edit Contact : " +
+                            "\nFirst Name : " + contact.get(0)[0] +
+                            "\nLast Name : " + contact.get(0)[1] +
+                            "\nPhone Number : " + contact.get(1)[0] +
+                            "\nIncoming Call Light : " + contact.get(2)[0] +
+                            "\nIncoming Call Flash Pattern : " + contact.get(3)[0] +
+                            "\nIncoming Call Flash Rate : " + contact.get(3)[1] +
+                            "\nMissed Call Light : " + contact.get(4)[0] +
+                            "\nMissed Call Flash Pattern : " + contact.get(5)[0] +
+                            "\nMissed Call Flash Rate : " + contact.get(5)[1]);
+                }
+            }
+        }
     }
 }

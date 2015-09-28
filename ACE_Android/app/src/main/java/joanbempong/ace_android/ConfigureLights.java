@@ -1,9 +1,15 @@
 package joanbempong.ace_android;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -13,15 +19,20 @@ public class ConfigureLights extends AppCompatActivity {
 
     TextView bodyText;
     ListView lightsList;
+    Button nextBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configure_lights);
 
-        //connects the textview and listview to the widgets created in xml
+        //connects the textview,listview, and button to the widgets created in xml
         bodyText = (TextView)findViewById(R.id.bodyText);
         lightsList = (ListView)findViewById(R.id.lightList);
+        nextBtn = (Button)findViewById(R.id.nextBtn);
+
+        //creates an on click listener
+        nextBtn.setOnClickListener(nextBtnOnClickListener);
 
         //sets the text for the textview
         bodyText.setText("Let's configure your lights.");
@@ -62,4 +73,45 @@ public class ConfigureLights extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    //action to take when the back button is pressed
+    @Override
+    public void onBackPressed()
+    {
+        //navigate to the HueRegister page
+        startActivity(new Intent(ConfigureLights.this, HueRegister.class));
+    }
+
+    OnClickListener nextBtnOnClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View arg0) {
+            if (!HueController.allLightsConfigured()){
+                //creates a new alert dialog
+                final AlertDialog.Builder alert = new AlertDialog.Builder(ConfigureLights.this);
+                alert.setTitle("Are you sure?");
+                alert.setMessage("All lights that have not been configured will be assumed to be working and do not support color.");
+                alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // navigate to the HueDefaultValues page
+                        startActivity(new Intent(ConfigureLights.this, HueDefaultValues.class));
+                    }
+                });
+
+                alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                //create the alert dialog and show it
+                alert.create();
+                alert.show();
+            }
+            else {
+                // navigate to the HueDefaultValues page
+                startActivity(new Intent(ConfigureLights.this, HueDefaultValues.class));
+            }
+        }
+    };
 }

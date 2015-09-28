@@ -70,7 +70,7 @@ public class Products extends AppCompatActivity {
     OnClickListener hueBtnOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View arg0) {
-            // navigate to the HueBridge class
+            // navigate to the HueRegister page
             startActivity(new Intent(Products.this, HueRegister.class));
         }
     };

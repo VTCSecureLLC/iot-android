@@ -1,9 +1,8 @@
 package joanbempong.ace_android;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +16,8 @@ public class FlashCheck extends AppCompatActivity {
 
     TextView lightName, bodyText, subBodyText;
     Button yesBtn;
+
+    public long sleep = 500;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +38,7 @@ public class FlashCheck extends AppCompatActivity {
         bodyText.setText("Is this light flashing?");
         subBodyText.setText("If not, make sure it is turned on");
 
-        //centers the text
-        bodyText.setGravity(Gravity.CENTER);
-        subBodyText.setGravity(Gravity.CENTER);
-
+        //test and see if the light is flashing
         HueController.testFlash = true;
 
         int lightList = 0;
@@ -48,8 +46,13 @@ public class FlashCheck extends AppCompatActivity {
         while (lightList != HueController.Lights.size()) {
             if (HueController.currentLightConfigure.equals(HueController.Lights.get(lightList)[3])) {
                 lightNum = Integer.parseInt(HueController.Lights.get(lightList)[0]);
-                HueController.putHueColorOn(lightNum);
-                HueController.putTestHueFlash(lightNum);
+                HueController.putHueDefaultColor(lightNum);
+                try {
+                    TimeUnit.MILLISECONDS.sleep(sleep);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                HueController.putHueFlashCheck(lightNum);
                 break;
             }
             lightList++;
@@ -82,7 +85,7 @@ public class FlashCheck extends AppCompatActivity {
     @Override
     public void onBackPressed()
     {
-        //navigate to the Products page
+        //navigate to the ConfigureLights page
         startActivity(new Intent(FlashCheck.this, ConfigureLights.class));
     }
 
@@ -95,7 +98,7 @@ public class FlashCheck extends AppCompatActivity {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            // navigate to the ColorCheck class
+            // navigate to the ColorCheck page
             startActivity(new Intent(FlashCheck.this, ColorCheck.class));
         }
     };

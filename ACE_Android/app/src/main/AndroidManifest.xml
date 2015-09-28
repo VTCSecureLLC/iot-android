@@ -50,6 +50,18 @@
             android:name=".ColorResult"
             android:label="@string/title_activity_color_result" >
         </activity>
+        <activity
+            android:name=".HueDefaultValues"
+            android:label="@string/title_activity_hue_default_values" >
+        </activity>
+        <activity
+            android:name=".ContactListDefault"
+            android:label="@string/title_activity_contact_list_default" >
+        </activity>
+        <activity
+            android:name=".CompletedSetup"
+            android:label="@string/title_activity_completed_setup" >
+        </activity>
     </application>
 
 </manifest>

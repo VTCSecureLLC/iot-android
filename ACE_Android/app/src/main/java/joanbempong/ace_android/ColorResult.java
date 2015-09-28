@@ -1,9 +1,8 @@
 package joanbempong.ace_android;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,8 +40,6 @@ public class ColorResult extends AppCompatActivity {
             bodyText.setText("This light does not support color.");
         }
 
-        //centers the text
-        bodyText.setGravity(Gravity.CENTER);
 
     }
 
@@ -72,7 +69,7 @@ public class ColorResult extends AppCompatActivity {
     @Override
     public void onBackPressed()
     {
-        //navigate to the Products page
+        //navigate to the ColorCheck page
         startActivity(new Intent(ColorResult.this, ColorCheck.class));
     }
 
@@ -80,14 +77,13 @@ public class ColorResult extends AppCompatActivity {
         @Override
         public void onClick(View arg0) {
             if (HueController.allLightsConfigured()){
-                // navigate to the HueDefaultValues class
-                //startActivity(new Intent(ColorResult.this, HueDefaultValues.class));
+                // navigate to the HueDefaultValues page
+                startActivity(new Intent(ColorResult.this, HueDefaultValues.class));
             }
-            else{
-                // navigate to the ConfigureLights class
+            else {
+                // navigate to the ConfigureLights page
                 startActivity(new Intent(ColorResult.this, ConfigureLights.class));
             }
-
         }
     };
 }

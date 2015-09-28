@@ -1,9 +1,8 @@
 package joanbempong.ace_android;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,10 +29,11 @@ public class MoreLights extends AppCompatActivity {
         yesBtn.setOnClickListener(yesBtnOnClickListener);
         noBtn.setOnClickListener(noBtnOnClickListener);
 
+
+        //counts the total number of lights for the Hue system
         int lightCount = 0;
         int lightList = 0;
         while (lightList != HueController.Lights.size()) {
-            //count the total number of lights for the Hue system
             lightCount++;
             lightList++;
         }
@@ -42,8 +42,6 @@ public class MoreLights extends AppCompatActivity {
         bodyText.setText(String.format("You have registered your hue bridge. Now, do you have more " +
                 "lights to add to the system?" + " (You currently have %s lights)", lightCount));
 
-        //centers the text
-        bodyText.setGravity(Gravity.CENTER);
     }
 
     @Override
@@ -72,14 +70,14 @@ public class MoreLights extends AppCompatActivity {
     @Override
     public void onBackPressed()
     {
-        //navigate to the Products page
+        //navigate to the HueRegister page
         startActivity(new Intent(MoreLights.this, HueRegister.class));
     }
 
     OnClickListener yesBtnOnClickListener = new OnClickListener() {
         @Override
         public void onClick(View arg0) {
-            // navigate to the AddLightsYes class
+            // navigate to the AddLights page
             //startActivity(new Intent(MoreLights.this, AddLights.class));
         }
     };
@@ -87,7 +85,7 @@ public class MoreLights extends AppCompatActivity {
     OnClickListener noBtnOnClickListener = new OnClickListener() {
         @Override
         public void onClick(View arg0) {
-            // navigate to the Products class
+            // navigate to the ConfigureLights page
             startActivity(new Intent(MoreLights.this, ConfigureLights.class));
         }
     };

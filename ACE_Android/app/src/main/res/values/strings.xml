@@ -12,4 +12,7 @@
     <string name="title_activity_flash_check">FlashCheck</string>
     <string name="title_activity_color_check">Color Check</string>
     <string name="title_activity_color_result">Color Result</string>
+    <string name="title_activity_hue_default_values">Setting Default Values for the Hue</string>
+    <string name="title_activity_contact_list_default">Assigning Default Values</string>
+    <string name="title_activity_completed_setup">Completed Setup</string>
 </resources>

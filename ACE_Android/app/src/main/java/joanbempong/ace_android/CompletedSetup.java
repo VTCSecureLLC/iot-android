@@ -10,32 +10,32 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class HueRegisterError extends AppCompatActivity {
+public class CompletedSetup extends AppCompatActivity {
 
     TextView bodyText;
-    Button tryAgainBtn;
+    Button takeMeHomeBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_hue_register_error);
+        setContentView(R.layout.activity_completed_setup);
 
         //connects the textview and button to the widgets created in xml
         bodyText = (TextView)findViewById(R.id.bodyText);
-        tryAgainBtn = (Button)findViewById(R.id.tryAgainBtn);
+        takeMeHomeBtn = (Button)findViewById(R.id.takeMeHomeBtn);
 
-        //creates an on click listener
-        tryAgainBtn.setOnClickListener(tryAgainBtnOnClickListener);
+        //creates an on click listeners
+        takeMeHomeBtn.setOnClickListener(takeMeHomeBtnOnClickListener);
 
         //sets the text for the textview
-        bodyText.setText("Please make sure you pressed the link button on the hue bridge.");
+        bodyText.setText("Congratulations! You have set up your Hue system.");
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_hue_register_error, menu);
+        getMenuInflater().inflate(R.menu.menu_completed_setup, menu);
         return true;
     }
 
@@ -58,21 +58,15 @@ public class HueRegisterError extends AppCompatActivity {
     @Override
     public void onBackPressed()
     {
-        //navigate to the HueRegister page
-        startActivity(new Intent(HueRegisterError.this, HueRegister.class));
+        //navigate to the ContactListDefault page
+        startActivity(new Intent(CompletedSetup.this, ContactListDefault.class));
     }
 
-    OnClickListener tryAgainBtnOnClickListener = new OnClickListener() {
+    OnClickListener takeMeHomeBtnOnClickListener = new OnClickListener() {
         @Override
         public void onClick(View arg0) {
-            //keep trying until the link button has been pressed by the user
-            if (HueController.postHue()) {
-                //the Hue has been registered
-                HueController.HUEregistered = true;
-
-                //navigate to the MoreLights page
-                startActivity(new Intent(HueRegisterError.this, MoreLights.class));
-            }
+            //navigate to the ACEHome page
+            //startActivity(new Intent(CompletedSetup.this, ACEHome.class));
         }
     };
 }

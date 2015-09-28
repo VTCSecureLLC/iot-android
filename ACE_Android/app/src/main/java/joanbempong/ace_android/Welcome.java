@@ -69,6 +69,7 @@ public class Welcome extends AppCompatActivity {
     {
         if(backButtonCount >= 1)
         {
+            //exit the application
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.addCategory(Intent.CATEGORY_HOME);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -77,6 +78,7 @@ public class Welcome extends AppCompatActivity {
         }
         else
         {
+            //have the user press the back button again to exit the application
             Toast.makeText(this, "Press the back button again to close the application.", Toast.LENGTH_SHORT).show();
             backButtonCount++;
         }
@@ -85,7 +87,7 @@ public class Welcome extends AppCompatActivity {
     OnClickListener nextBtnOnClickListener = new OnClickListener() {
         @Override
         public void onClick(View arg0) {
-            // navigate to the Products class
+            // navigate to the Products page
             startActivity(new Intent(Welcome.this, Products.class));
         }
     };

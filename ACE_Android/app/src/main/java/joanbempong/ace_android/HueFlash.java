@@ -11,16 +11,16 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by Joan Bempong on 9/25/2015.
+ * Created by Joan Bempong on 9/28/2015.
  */
-public class TestHueFlash extends AsyncTask<Void, Void, Void> {
+public class HueFlash extends AsyncTask<Void, Void, Void> {
     public String host;
     public String username;
     public int lightNum;
     public long sleep = 500;
 
     //Constructor
-    TestHueFlash(String DefaultHost, String DefaultUsername, int light){
+    HueFlash(String DefaultHost, String DefaultUsername, int light){
         host = DefaultHost;
         username = DefaultUsername;
         lightNum = light;

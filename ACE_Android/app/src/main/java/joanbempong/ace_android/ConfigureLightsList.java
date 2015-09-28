@@ -79,7 +79,7 @@ public class ConfigureLightsList extends BaseAdapter implements ListAdapter {
                 //store the name of the current light being configured
                 HueController.currentLightConfigure = list.get(position);
 
-                //navigate to the FlashCheck class
+                //navigate to the FlashCheck page
                 context.startActivity(new Intent(context, FlashCheck.class));
 
                 notifyDataSetChanged();
