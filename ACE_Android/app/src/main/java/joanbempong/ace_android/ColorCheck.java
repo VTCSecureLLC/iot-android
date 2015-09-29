@@ -136,7 +136,6 @@ public class ColorCheck extends AppCompatActivity {
                     System.out.println("doesnt support color");
                     if (light[9].equals("false")) {
                         light[9] = "true";
-                        System.out.println("light has been configured");
                         break;
                     }
                 }

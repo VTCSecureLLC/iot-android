@@ -297,12 +297,13 @@ public class ListLights extends BaseAdapter implements ListAdapter {
 
                     lightval++;
                 }
-                if (lightBright == 0) {
+                /*if (lightBright == 0) {
                     HueController.putHueOff(lightNum);
                 }
                 else {
                     HueController.putHueOn(lightNum, lightBright);
-                }
+                }*/
+                HueController.putHueOn(lightNum, lightBright);
             }
 
             @Override

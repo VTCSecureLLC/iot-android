@@ -40,10 +40,10 @@ public class ContactListDefault extends AppCompatActivity {
 
         //"retrieve" the contact list by creating new one (for testing purpose)
         if (HueController.Contacts.size() == 0) {
-            HueController.newContact("Shareef", "Ali", "1111111111", "", "", "", "", "", "");
-            HueController.newContact("Gary", "Behm", "1111111111","", "", "", "", "", "");
-            HueController.newContact("Joan", "Bempong", "1111111111", "", "", "", "", "", "");
-            HueController.newContact("Brian", "Trager", "1111111111", "", "", "", "", "", "");
+            HueController.newContact("Shareef", "Ali", "1111111111", "", "0", "0", "", "0", "0");
+            HueController.newContact("Gary", "Behm", "1111111111","", "0", "0", "", "0", "0");
+            HueController.newContact("Joan", "Bempong", "1111111111", "", "0", "0", "", "0", "0");
+            HueController.newContact("Brian", "Trager", "1111111111", "", "0", "0", "", "0", "0");
         }
     }
 

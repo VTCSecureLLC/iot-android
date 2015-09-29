@@ -5,23 +5,36 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
-public class Lights extends AppCompatActivity {
+public class MyLights extends AppCompatActivity {
 
-
+    Button addBtn;
     ListView listLights;
     ArrayList<String> stringArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_lights);
+        setContentView(R.layout.activity_my_lights);
 
-        //connects the listview to the widget created in xml
+        //connects the button and listView to the widgets created in xml
+        addBtn = (Button)findViewById(R.id.addBtn);
         listLights = (ListView)findViewById(R.id.listLights);
+
+        //creates an on click listener
+        addBtn.setOnClickListener(addBtnOnClickListener);
+
+        //sets the text for the button
+        addBtn.setText("+ new contact");
+
+        //lists all the stored contacts
+        stringArray = new ArrayList<>();
 
         //add lights to the listview
         stringArray = new ArrayList<>();
@@ -33,14 +46,14 @@ public class Lights extends AppCompatActivity {
             lightList++;
         }
 
-        ListLights adapter = new ListLights(stringArray, this);
+        ListLightsSettings adapter = new ListLightsSettings(stringArray, this);
         listLights.setAdapter(adapter);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_lights, menu);
+        getMenuInflater().inflate(R.menu.menu_my_lights, menu);
         return true;
     }
 
@@ -52,17 +65,8 @@ public class Lights extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_home) {
-            //navigate to the Home page
-            startActivity(new Intent(Lights.this, Home.class));
-        }
-        else if (id == R.id.action_lights) {
-            //navigate to the Lights page
-            startActivity(new Intent(Lights.this, Lights.class));
-        }
-        else if (id == R.id.action_settings) {
-            //navigate to the Settings page
-            startActivity(new Intent(Lights.this, Settings.class));
+        if (id == R.id.action_settings) {
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -72,7 +76,15 @@ public class Lights extends AppCompatActivity {
     @Override
     public void onBackPressed()
     {
-        //navigate to the Home page
-        startActivity(new Intent(Lights.this, Home.class));
+        //navigate to the Settings page
+        startActivity(new Intent(MyLights.this, Settings.class));
     }
+
+    OnClickListener addBtnOnClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View arg0) {
+            //navigate to the AddContact page
+            //startActivity(new Intent(MyLights.this, AddLight.class));
+        }
+    };
 }

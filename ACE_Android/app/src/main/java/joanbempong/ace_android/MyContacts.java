@@ -1,46 +1,48 @@
 package joanbempong.ace_android;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Home extends AppCompatActivity {
+public class MyContacts extends AppCompatActivity {
 
-    TextView bodyText;
+    Button addBtn;
     ListView listContacts;
-
     ArrayList<String> stringArray;
-    int backButtonCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_my_contacts);
 
-        //connects the textview and listview to the widgets created in xml
-        bodyText = (TextView)findViewById(R.id.bodyText);
+        //connects the button and listView to the widgets created in xml
+        addBtn = (Button)findViewById(R.id.addBtn);
         listContacts = (ListView)findViewById(R.id.listContacts);
 
-        //sets the text for the textview
-        bodyText.setText("Simulate an incoming call.");
+        //creates an on click listener
+        addBtn.setOnClickListener(addBtnOnClickListener);
 
-        //list all the stored contacts
+        //sets the text for the button
+        addBtn.setText("+ new contact");
+
+        //lists all the stored contacts
         stringArray = new ArrayList<>();
 
-        if (HueController.Contacts.size() != 0){
+        if (HueController.Contacts != null){
             for (List<String[]> contact: HueController.Contacts){
                 stringArray.add(contact.get(0)[0] + " " + contact.get(0)[1]);
             }
 
-            SimulateButtons adapter = new SimulateButtons(stringArray, this);
+            ListContacts adapter = new ListContacts(stringArray, this);
             listContacts.setAdapter(adapter);
         }
     }
@@ -48,7 +50,7 @@ public class Home extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_home, menu);
+        getMenuInflater().inflate(R.menu.menu_my_contacts, menu);
         return true;
     }
 
@@ -62,15 +64,15 @@ public class Home extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_home) {
             //navigate to the Home page
-            startActivity(new Intent(Home.this, Home.class));
+            startActivity(new Intent(MyContacts.this, Home.class));
         }
         else if (id == R.id.action_lights) {
             //navigate to the Lights page
-            startActivity(new Intent(Home.this, Lights.class));
+            startActivity(new Intent(MyContacts.this, Lights.class));
         }
         else if (id == R.id.action_settings) {
             //navigate to the Settings page
-            startActivity(new Intent(Home.this, Settings.class));
+            startActivity(new Intent(MyContacts.this, Settings.class));
         }
 
         return super.onOptionsItemSelected(item);
@@ -80,20 +82,15 @@ public class Home extends AppCompatActivity {
     @Override
     public void onBackPressed()
     {
-        if(backButtonCount >= 1)
-        {
-            //exit the application
-            Intent intent = new Intent(Intent.ACTION_MAIN);
-            intent.addCategory(Intent.CATEGORY_HOME);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            backButtonCount = 0;
-        }
-        else
-        {
-            //have the user press the back button again to exit the application
-            Toast.makeText(this, "Press the back button again to close the application.", Toast.LENGTH_SHORT).show();
-            backButtonCount++;
-        }
+        //navigate to the Settings page
+        startActivity(new Intent(MyContacts.this, Settings.class));
     }
+
+    OnClickListener addBtnOnClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View arg0) {
+            //navigate to the AddContact page
+            startActivity(new Intent(MyContacts.this, AddContact.class));
+        }
+    };
 }

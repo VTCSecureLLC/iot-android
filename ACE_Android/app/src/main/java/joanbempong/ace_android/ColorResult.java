@@ -76,14 +76,8 @@ public class ColorResult extends AppCompatActivity {
     OnClickListener nextBtnOnClickListener = new OnClickListener() {
         @Override
         public void onClick(View arg0) {
-            if (HueController.allLightsConfigured()){
-                // navigate to the HueDefaultValues page
-                startActivity(new Intent(ColorResult.this, HueDefaultValues.class));
-            }
-            else {
-                // navigate to the ConfigureLights page
-                startActivity(new Intent(ColorResult.this, ConfigureLights.class));
-            }
+            // navigate to the RenameLight page
+            startActivity(new Intent(ColorResult.this, RenameLight.class));
         }
     };
 }

@@ -17,4 +17,10 @@
     <string name="title_activity_completed_setup">Completed Setup</string>
     <string name="title_activity_home">Home</string>
     <string name="title_activity_lights">Lights</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_my_contacts">My Contacts</string>
+    <string name="title_activity_edit_contact">Edit Contact</string>
+    <string name="title_activity_add_contact">Add Contact</string>
+    <string name="title_activity_my_lights">MyLights</string>
+    <string name="title_activity_rename_light">Rename Light</string>
 </resources>

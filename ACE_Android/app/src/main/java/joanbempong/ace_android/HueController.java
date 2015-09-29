@@ -94,6 +94,11 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
     static String oldFirstName, oldLastName, oldPhoneNumber, oldIncomingCallLight, oldIncomingCallFlashPattern,
             oldIncomingCallFlashRate, oldMissedCallLight, oldMissedCallFlashPattern, oldMissedCallFlashRate;
 
+    //old light information
+    static String oldLightValue, oldLightState, oldLightType, oldLightName, oldLightModelId,
+            oldLightManufacturerName, oldLightUniqueId, oldLightSWVersion, oldLightPointSymbol,
+            oldLightConfigured, oldLightColor;
+
     //constructor
     public HueController(HueConnection hueConnection) {
         this.hueConnection = hueConnection;
@@ -197,6 +202,7 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
     public static void populateHueLights(){
         URL url;
         String response = "";
+        Lights = new ArrayList<>();
         try{
             //creates a new url and client
             url = new URL(String.format("http://%s/api/%s/lights", DefaultHost, DefaultUsername));
@@ -255,7 +261,8 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
 
                     //"create" a new light
                     Light = new String[11];
-                    Light[0] = String.valueOf(i+1);
+                    Light[0] = responseSplit[i].substring(2,3);
+                    //Light[0] = String.valueOf(i+1);
                     Light[1] = LightState;
                     Light[2] = LightType;
                     Light[3] = LightName;
@@ -341,7 +348,7 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
     public static void putHueOn(int lightNum, int lightBright){
         URL url;
         String response = "";
-        hueCommandOn = String.format("{\"on\": true, \"bri\":%s}", lightBright);
+        String command = String.format("{\"on\": true, \"bri\":%s}", lightBright);
         try{
             //creates a new url and client
             url = new URL(String.format("http://%s/api/%s/lights/%s/state", DefaultHost, DefaultUsername, lightNum));
@@ -352,7 +359,7 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
 
             //writes to the bridge to turn off the LED bulb
             OutputStreamWriter send = new OutputStreamWriter(client.getOutputStream());
-            send.write(hueCommandOn);
+            send.write(command);
             send.close();
 
             //reads the message sent by the Hue Bridge
@@ -700,6 +707,71 @@ public class HueController extends AsyncTask<Void, Void, Boolean> {
 
                 }
 
+        }
+    }
+
+    public static void saveCurrentLightInformation(String name){
+        oldLightName = name;
+        for (String[] Light : Lights) {
+            if (Light[3].equals(oldLightName)) {
+                oldLightValue = Light[0];
+                oldLightState = Light[1];
+                oldLightType = Light[2];
+                oldLightModelId = Light[4];
+                oldLightManufacturerName = Light[5];
+                oldLightUniqueId = Light[6];
+                oldLightSWVersion = Light[7];
+                oldLightPointSymbol = Light[8];
+                oldLightConfigured = Light[9];
+                oldLightColor = Light[10];
+            }
+        }
+    }
+
+    public static void renameLight(String name, int lightNum) {
+        String renameLight = String.format("{\"name\": \"%s\"}", name);
+        System.out.println(renameLight);
+
+        URL url;
+        String response = "";
+        try {
+            //creates a new url and client
+            url = new URL(String.format("http://%s/api/%s/lights/%s", DefaultHost, DefaultUsername, lightNum));
+            System.out.println(url);
+            HttpURLConnection client = (HttpURLConnection) url.openConnection();
+            client.setDoOutput(true);
+            client.setRequestMethod("PUT");
+
+            //writes to the bridge to turn on the LED bulb
+            OutputStreamWriter send = new OutputStreamWriter(client.getOutputStream());
+            send.write(renameLight);
+            send.close();
+
+            //reads the message sent by the Hue Bridge
+            Scanner in = new Scanner(client.getInputStream());
+            while (in.hasNextLine()) {
+                response += (in.nextLine());
+            }
+            System.out.println("in huecontroller renameLight");
+            System.out.println(response);
+            client.disconnect();
+        } catch (NetworkOnMainThreadException e) {
+            e.printStackTrace();
+            System.out.println("in network on main thread exception");
+        } catch (IOException e) {
+            System.out.println("in ioexception");
+            e.printStackTrace();
+        }
+
+        //rename the light in the Lights array
+        for (String[] light: Lights){
+            System.out.println(name);
+            System.out.println(light[3]);
+            System.out.println(light[0]);
+            if (currentLightConfigure.equals(light[3])) {
+                light[3] = name;
+                break;
+            }
         }
     }
 }
