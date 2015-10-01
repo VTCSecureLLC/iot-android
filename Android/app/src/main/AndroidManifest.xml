@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="joanbempong.android" >
+
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="17" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".WelcomeActivity"
+            android:label="@string/title_activity_welcome" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ProductsActivity"
+            android:label="@string/title_activity_products" >
+        </activity>
+        <activity
+            android:name=".HueBridgeSearchActivity"
+            android:label="@string/title_activity_hue_bridge_search" >
+        </activity>
+        <activity
+            android:name=".HomeActivity"
+            android:label="@string/title_activity_home" >
+        </activity>
+        <activity
+            android:name=".HuePushLinkActivity"
+            android:label="@string/title_activity_hue_push_link" >
+        </activity>
+        <activity
+            android:name=".MoreLightsActivity"
+            android:label="@string/title_activity_more_lights" >
+        </activity>
+        <activity
+            android:name=".ConfigureLightsActivity"
+            android:label="@string/title_activity_configure_lights" >
+        </activity>
+        <activity
+            android:name=".AddLightActivity"
+            android:label="@string/title_activity_add_light" >
+        </activity>
+    </application>
+
+</manifest>
