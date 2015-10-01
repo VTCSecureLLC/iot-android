@@ -1,16 +1,46 @@
 package joanbempong.android;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
+
+    ListView listContacts;
+    HueController hueController;
+
+    ArrayList<String> stringArray;
+    int backButtonCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        hueController = HueController.getInstance();
+
+        //connects the listview to the widgets created in xml
+        listContacts = (ListView)findViewById(R.id.listContacts);
+
+
+        //list all the stored contacts
+        stringArray = new ArrayList<>();
+
+        if (hueController.getContactList().size() != 0){
+            for (List<String[]> contact: hueController.getContactList()){
+                stringArray.add(contact.get(0)[0] + " " + contact.get(0)[1]);
+            }
+
+            SimulateCallAdapter adapter = new SimulateCallAdapter(this, stringArray, hueController);
+            listContacts.setAdapter(adapter);
+        }
     }
 
     @Override
@@ -28,10 +58,40 @@ public class HomeActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_home) {
+            //navigate to the Home page
+            startActivity(new Intent(HomeActivity.this, HomeActivity.class));
+        }
+        else if (id == R.id.action_lights) {
+            //navigate to the Lights page
+            startActivity(new Intent(HomeActivity.this, LightsActivity.class));
+        }
+        else if (id == R.id.action_settings) {
+            //navigate to the Settings page
+            startActivity(new Intent(HomeActivity.this, SettingsActivity.class));
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    //action to take when the back button is pressed
+    @Override
+    public void onBackPressed()
+    {
+        if(backButtonCount >= 1)
+        {
+            //exit the application
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            backButtonCount = 0;
+        }
+        else
+        {
+            //have the user press the back button again to exit the application
+            Toast.makeText(this, "Press the back button again to close the application.", Toast.LENGTH_SHORT).show();
+            backButtonCount++;
+        }
     }
 }

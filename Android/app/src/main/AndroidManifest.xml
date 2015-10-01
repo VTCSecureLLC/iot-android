@@ -50,6 +50,38 @@
             android:name=".AddLightActivity"
             android:label="@string/title_activity_add_light" >
         </activity>
+        <activity
+            android:name=".HueDefaultValuesActivity"
+            android:label="@string/title_activity_hue_default_values" >
+        </activity>
+        <activity
+            android:name=".ContactListDefaultActivity"
+            android:label="@string/title_activity_contact_list_default" >
+        </activity>
+        <activity
+            android:name=".CompletedSetupActivity"
+            android:label="@string/title_activity_completed_setup" >
+        </activity>
+        <activity
+            android:name=".LightsActivity"
+            android:label="@string/title_activity_lights" >
+        </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" >
+        </activity>
+        <activity
+            android:name=".MyContactsActivity"
+            android:label="@string/title_activity_my_contacts" >
+        </activity>
+        <activity
+            android:name=".AddContactActivity"
+            android:label="@string/title_activity_add_contact" >
+        </activity>
+        <activity
+            android:name=".EditContactActivity"
+            android:label="@string/title_activity_edit_contact" >
+        </activity>
     </application>
 
 </manifest>

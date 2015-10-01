@@ -56,6 +56,14 @@ public class AddLightActivity extends Activity {
     }
 
     public void searchOnClick() {
+        System.out.println("current light: ");
+
+        PHBridge bridge = phHueSDK.getSelectedBridge();
+        List<PHLight> allLights = bridge.getResourceCache().getAllLights();
+        for (PHLight light : allLights){
+            System.out.println(light.getName());
+        }
+
         bridge = phHueSDK.getSelectedBridge();
         PHWizardAlertDialog.getInstance().showProgressDialog(R.string.search_progress, AddLightActivity.this);
         bridge.findNewLights(listener);
@@ -104,34 +112,6 @@ public class AddLightActivity extends Activity {
         public void onError(int code, final String message) {
             System.out.println("error");
             System.out.println(message);
-            /*if (code == PHMessageType.PUSHLINK_BUTTON_NOT_PRESSED) {
-                incrementProgress();
-            }
-            else if (code == PHMessageType.)(code == PHMessageType.PUSHLINK_AUTHENTICATION_FAILED) {
-                incrementProgress();
-
-                if (!isDialogShowing) {
-                    isDialogShowing=true;
-                    AddLightActivity.this.runOnUiThread(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(AddLightActivity.this);
-                            builder.setMessage(message).setNeutralButton(R.string.btn_ok,
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            finish();
-                                        }
-                                    });
-
-                            builder.create();
-                            builder.show();
-                        }
-                    });
-                }
-
-            }*/
-
         }
 
         @Override
@@ -141,14 +121,30 @@ public class AddLightActivity extends Activity {
         }
 
         @Override
-        public void onReceivingLights(List<PHBridgeResource> arg0) {
+        public void onReceivingLights(List<PHBridgeResource> list) {
+            System.out.println(list.size());
+            if (list.size() != 0) {
+                for (PHBridgeResource br : list) {
+                    System.out.println(br.getName());
+                    System.out.println(br.getIdentifier());
+                }
+            }
             System.out.println("new light receiving");
             incrementProgress();
         }
 
         @Override
         public void onSearchComplete() {
+            System.out.println("updated light: ");
+
+            PHBridge bridge = phHueSDK.getSelectedBridge();
+            List<PHLight> allLights = bridge.getResourceCache().getAllLights();
+            for (PHLight light : allLights){
+                System.out.println(light.getName());
+            }
+
             System.out.println("search is completed, navigating");
+
             // navigate to the AddLights page
             startActivity(new Intent(AddLightActivity.this, ConfigureLightsActivity.class));
         }
