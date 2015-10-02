@@ -98,6 +98,11 @@
     <string name="title_activity_add_contact">Add Contact</string>
     <string name="notifications">Notifications</string>
     <string name="title_activity_edit_contact">Edit Contact</string>
+    <string name="title_activity_my_lights">My Lights</string>
+    <string name="new_light">+ new light</string>
+    <string name="title_activity_add_light_setup">Add Light</string>
+
+    <string name="hello_world">Hello world!</string>
 
 
 </resources>

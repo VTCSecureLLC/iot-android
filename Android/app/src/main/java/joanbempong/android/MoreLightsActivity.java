@@ -28,6 +28,8 @@ public class MoreLightsActivity extends Activity {
 
         phHueSDK = PHHueSDK.getInstance();
 
+        phHueSDK.setDeviceName("ACTNotification");
+
         Button yesBtn, noBtn;
 
         yesBtn = (Button) findViewById(R.id.yesBtn);
@@ -60,7 +62,7 @@ public class MoreLightsActivity extends Activity {
 
     public void yesOnClick() {
         // navigate to the AddLights page
-        startActivity(new Intent(MoreLightsActivity.this, AddLightActivity.class));
+        startActivity(new Intent(MoreLightsActivity.this, AddLightSetupActivity.class));
     }
 
     public void noOnClick() {

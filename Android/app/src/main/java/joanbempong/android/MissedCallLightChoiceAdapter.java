@@ -66,6 +66,12 @@ public class MissedCallLightChoiceAdapter extends BaseAdapter {
                 }
             }
         });
+
+        for (String l : controller.getOldContactMissedCallLight()){
+            if (lightName.getText().equals(l)){
+                lightName.setChecked(true);
+            }
+        }
         return view;
     }
 

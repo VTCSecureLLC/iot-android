@@ -120,26 +120,47 @@ public class EditContactActivity extends AppCompatActivity {
     View.OnClickListener saveBtnOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View arg0) {
-            //look for the contact and replace with new information
-            hueController.editContact(String.valueOf(firstName.getText()),
-                    String.valueOf(lastName.getText()), String.valueOf(phoneNumber.getText()),
-                    hueController.getIncomingCallLights(),
-                    String.valueOf(incomingCallFlashPatternList.getSelectedItem()),
-                    String.valueOf(incomingCallFlashRateList.getSelectedItem()),
-                    hueController.getMissedCallLights(),
-                    String.valueOf(missedCallDurationList.getSelectedItem()));
+            if (hueController.getIncomingCallDefaultLights().size() == 0){
+                Toast.makeText(EditContactActivity.this, "Please choose a light or more for your default incoming calls.", Toast.LENGTH_SHORT).show();
+            }else if (incomingCallFlashPatternList.getSelectedItem().equals("--")){
+                Toast.makeText(EditContactActivity.this, "Please choose a flash pattern for your default incoming calls.", Toast.LENGTH_SHORT).show();
+            }else if (incomingCallFlashRateList.getSelectedItem().equals("--")){
+                Toast.makeText(EditContactActivity.this, "Please choose a flash rate for your default incoming calls.", Toast.LENGTH_SHORT).show();
+            }else if (hueController.getMissedCallDefaultLights().size() == 0){
+                Toast.makeText(EditContactActivity.this, "Please choose a light or more for your default missed calls.", Toast.LENGTH_SHORT).show();
+            }else if (missedCallDurationList.getSelectedItem().equals("--")){
+                Toast.makeText(EditContactActivity.this, "Please choose a duration for your default missed calls.", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                //look for the contact and replace with new information
+                hueController.editContact(String.valueOf(firstName.getText()),
+                        String.valueOf(lastName.getText()), String.valueOf(phoneNumber.getText()),
+                        hueController.getIncomingCallLights(),
+                        String.valueOf(incomingCallFlashPatternList.getSelectedItem()),
+                        String.valueOf(incomingCallFlashRateList.getSelectedItem()),
+                        hueController.getMissedCallLights(),
+                        String.valueOf(missedCallDurationList.getSelectedItem()));
 
-            //contact has been saved -- show a toast
-            Context context = getApplicationContext();
-            CharSequence text = "The information for this contact has been updated.";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
+                //contact has been saved -- show a toast
+                Context context = getApplicationContext();
+                CharSequence text = "The information for this contact has been updated.";
+                int duration = Toast.LENGTH_SHORT;
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
 
-            // navigate to the MyContacts page
-            startActivity(new Intent(EditContactActivity.this, MyContactsActivity.class));
+                // navigate to the MyContacts page
+                startActivity(new Intent(EditContactActivity.this, MyContactsActivity.class));
+            }
         }
     };
+
+    //action to take when the back button is pressed
+    @Override
+    public void onBackPressed()
+    {
+        //navigate to the MyContacts page
+        startActivity(new Intent(EditContactActivity.this, MyContactsActivity.class));
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

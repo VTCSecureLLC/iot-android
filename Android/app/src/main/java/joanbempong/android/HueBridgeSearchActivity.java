@@ -26,7 +26,7 @@ import java.util.List;
 public class HueBridgeSearchActivity extends Activity implements OnItemClickListener {
 
     private PHHueSDK phHueSDK;
-    public static final String TAG = "ACE Notification";
+    public static final String TAG = "ACENotification";
     private HueSharedPreferences prefs;
     private AccessPointListAdapter adapter;
 
@@ -41,7 +41,7 @@ public class HueBridgeSearchActivity extends Activity implements OnItemClickList
         phHueSDK = PHHueSDK.create();
 
         // Set the Device Name (name of your app). This will be stored in your bridge whitelist entry.
-        phHueSDK.setAppName("ACE Notification");
+        phHueSDK.setAppName("ACENotification");
         phHueSDK.setDeviceName(Build.MODEL);
 
         // Register the PHSDKListener to receive callbacks from the bridge.

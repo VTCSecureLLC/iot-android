@@ -19,7 +19,7 @@ import com.philips.lighting.model.PHLight;
 import java.util.List;
 import java.util.Map;
 
-public class AddLightActivity extends Activity {
+public class AddLightSetupActivity extends Activity {
     private PHHueSDK phHueSDK;
     private ProgressBar pbar;
     private static final int MAX_TIME=60;
@@ -29,7 +29,7 @@ public class AddLightActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_light);
+        setContentView(R.layout.activity_add_light_setup);
 
 
         isDialogShowing=false;
@@ -58,14 +58,13 @@ public class AddLightActivity extends Activity {
     public void searchOnClick() {
         System.out.println("current light: ");
 
-        PHBridge bridge = phHueSDK.getSelectedBridge();
+        bridge = phHueSDK.getSelectedBridge();
         List<PHLight> allLights = bridge.getResourceCache().getAllLights();
         for (PHLight light : allLights){
             System.out.println(light.getName());
         }
 
-        bridge = phHueSDK.getSelectedBridge();
-        PHWizardAlertDialog.getInstance().showProgressDialog(R.string.search_progress, AddLightActivity.this);
+        PHWizardAlertDialog.getInstance().showProgressDialog(R.string.search_progress, AddLightSetupActivity.this);
         bridge.findNewLights(listener);
     }
 
@@ -127,6 +126,14 @@ public class AddLightActivity extends Activity {
                 for (PHBridgeResource br : list) {
                     System.out.println(br.getName());
                     System.out.println(br.getIdentifier());
+
+                    //works but an error is received:
+                    //Attempt to invoke virtual method 'com.philips.lighting.model.PHLightState com.philips.lighting.model.PHLight.getLastKnownLightState()' on a null object reference
+                    /*PHLightState state = new PHLightState();
+                    state.setOn(true);
+                    bridge.updateLightState(br.getIdentifier(), state, listener);*/
+
+                    System.out.println("light should be on");
                 }
             }
             System.out.println("new light receiving");
@@ -137,7 +144,6 @@ public class AddLightActivity extends Activity {
         public void onSearchComplete() {
             System.out.println("updated light: ");
 
-            PHBridge bridge = phHueSDK.getSelectedBridge();
             List<PHLight> allLights = bridge.getResourceCache().getAllLights();
             for (PHLight light : allLights){
                 System.out.println(light.getName());
@@ -146,7 +152,7 @@ public class AddLightActivity extends Activity {
             System.out.println("search is completed, navigating");
 
             // navigate to the AddLights page
-            startActivity(new Intent(AddLightActivity.this, ConfigureLightsActivity.class));
+            startActivity(new Intent(AddLightSetupActivity.this, ConfigureLightsActivity.class));
         }
     };
 }

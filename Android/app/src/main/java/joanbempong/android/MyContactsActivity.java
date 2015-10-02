@@ -57,6 +57,15 @@ public class MyContactsActivity extends AppCompatActivity {
         }
     };
 
+    //action to take when the back button is pressed
+    @Override
+    public void onBackPressed()
+    {
+        //navigate to the Settings page
+        startActivity(new Intent(MyContactsActivity.this, SettingsActivity.class));
+    }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

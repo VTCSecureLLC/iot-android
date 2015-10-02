@@ -40,7 +40,7 @@ public class SettingsActivity extends AppCompatActivity {
         @Override
         public void onClick(View arg0) {
             //navigate to the MyLights page
-            //startActivity(new Intent(SettingsActivity.this, MyLightsActivity.class));
+            startActivity(new Intent(SettingsActivity.this, MyLightsActivity.class));
         }
     };
 
@@ -51,6 +51,14 @@ public class SettingsActivity extends AppCompatActivity {
             //startActivity(new Intent(SettingsActivity.this, MyDevices.class));
         }
     };
+
+    //action to take when the back button is pressed
+    @Override
+    public void onBackPressed()
+    {
+        //navigate to the Home page
+        startActivity(new Intent(SettingsActivity.this, HomeActivity.class));
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -36,6 +36,14 @@ public class LightsActivity extends AppCompatActivity {
         listLights.setAdapter(adapter);
     }
 
+    //action to take when the back button is pressed
+    @Override
+    public void onBackPressed()
+    {
+        //navigate to the Home page
+        startActivity(new Intent(LightsActivity.this, HomeActivity.class));
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

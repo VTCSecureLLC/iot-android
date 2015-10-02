@@ -25,9 +25,9 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by Joan Bempong on 9/30/2015.
+ * Created by Joan Bempong on 10/2/2015.
  */
-public class ConfigureLightAdapter extends BaseAdapter {
+public class EditLightAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     private List<PHLight> allLights;
     private Context context;
@@ -39,7 +39,7 @@ public class ConfigureLightAdapter extends BaseAdapter {
      * @param context   the Context object.
      * @param allLights an array list of {@link PHLight} object to display.
      */
-    public ConfigureLightAdapter(Context context, List<PHLight> allLights) {
+    public EditLightAdapter(Context context, List<PHLight> allLights) {
         this.context = context;
         // Cache the LayoutInflate to avoid asking for a new one each time.
         mInflater = LayoutInflater.from(context);
@@ -112,7 +112,7 @@ public class ConfigureLightAdapter extends BaseAdapter {
                                     e.printStackTrace();
                                 }
                                 //navigate to the ConfigureLightsActivity class
-                                context.startActivity(new Intent(context, ConfigureLightsActivity.class));
+                                context.startActivity(new Intent(context, MyLightsActivity.class));
                             }
                         });
                         builder.setNegativeButton(R.string.btn_no, new DialogInterface.OnClickListener() {
@@ -138,35 +138,23 @@ public class ConfigureLightAdapter extends BaseAdapter {
         PHLightListener listener = new PHLightListener() {
 
             @Override
-            public void onReceivingLightDetails(PHLight phLight) {
-
-            }
-
-            @Override
-            public void onReceivingLights(List<PHBridgeResource> list) {
-
-            }
-
-            @Override
-            public void onSearchComplete() {
-
-            }
-
-            @Override
             public void onSuccess() {
-                System.out.println("success");
             }
 
             @Override
-            public void onError(int i, String s) {
-
-            }
+            public void onStateUpdate(Map<String, String> arg0, List<PHHueError> arg1) {}
 
             @Override
-            public void onStateUpdate(Map<String, String> map, List<PHHueError> list) {
+            public void onError(int arg0, String arg1) {}
 
-            }
+            @Override
+            public void onReceivingLightDetails(PHLight arg0) {}
 
+            @Override
+            public void onReceivingLights(List<PHBridgeResource> arg0) {}
+
+            @Override
+            public void onSearchComplete() {}
         };
         PHHueSDK phHueSDK = PHHueSDK.create();
         PHBridge bridge = phHueSDK.getSelectedBridge();
@@ -206,9 +194,9 @@ public class ConfigureLightAdapter extends BaseAdapter {
         PHHueSDK phHueSDK = PHHueSDK.create();
         PHBridge bridge = phHueSDK.getSelectedBridge();
         bridge.updateLight(light, listener);
-        
+
         //navigate to the ConfigureLightsActivity class
-        context.startActivity(new Intent(context, ConfigureLightsActivity.class));
+        context.startActivity(new Intent(context, MyLightsActivity.class));
     }
 
     /**

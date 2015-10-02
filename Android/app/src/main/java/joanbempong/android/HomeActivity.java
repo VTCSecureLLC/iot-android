@@ -43,6 +43,27 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+    //action to take when the back button is pressed
+    @Override
+    public void onBackPressed()
+    {
+        if(backButtonCount >= 1)
+        {
+            //exit the application
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            backButtonCount = 0;
+        }
+        else
+        {
+            //have the user press the back button again to exit the application
+            Toast.makeText(this, "Press the back button again to close the application.", Toast.LENGTH_SHORT).show();
+            backButtonCount++;
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -72,26 +93,5 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    //action to take when the back button is pressed
-    @Override
-    public void onBackPressed()
-    {
-        if(backButtonCount >= 1)
-        {
-            //exit the application
-            Intent intent = new Intent(Intent.ACTION_MAIN);
-            intent.addCategory(Intent.CATEGORY_HOME);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            backButtonCount = 0;
-        }
-        else
-        {
-            //have the user press the back button again to exit the application
-            Toast.makeText(this, "Press the back button again to close the application.", Toast.LENGTH_SHORT).show();
-            backButtonCount++;
-        }
     }
 }

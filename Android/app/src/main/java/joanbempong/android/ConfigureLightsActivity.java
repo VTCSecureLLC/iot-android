@@ -18,6 +18,7 @@ import java.util.List;
 public class ConfigureLightsActivity extends AppCompatActivity {
     private PHHueSDK phHueSDK;
     public static final String TAG = "ACE Notification";
+    private HueSharedPreferences prefs;
 
     private ConfigureLightAdapter adapter;
 
@@ -46,6 +47,9 @@ public class ConfigureLightsActivity extends AppCompatActivity {
 
         ListView allLightsList = (ListView) findViewById(R.id.light_list);
         allLightsList.setAdapter(adapter);
+
+        prefs = HueSharedPreferences.getInstance(getApplicationContext());
+        System.out.println("bridge username: " +  prefs.getUsername());
     }
 
     public void nextOnClick() {

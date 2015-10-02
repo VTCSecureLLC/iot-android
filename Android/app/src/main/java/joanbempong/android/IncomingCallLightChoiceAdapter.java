@@ -66,6 +66,15 @@ public class IncomingCallLightChoiceAdapter extends BaseAdapter {
                 }
             }
         });
+
+        for (String l : controller.getOldContactIncomingCallLight()){
+            System.out.println("checkbox name: " + lightName.getText());
+            System.out.println("old contact incoming call light: " + l);
+            if (lightName.getText().equals(l)){
+                lightName.setChecked(true);
+                System.out.println("set selected: " + lightName.isChecked());
+            }
+        }
         return view;
     }
 
