@@ -410,51 +410,57 @@ public class HueController {
         PHHueSDK phHueSDK;
         phHueSDK = PHHueSDK.create();
         final PHBridge bridge = phHueSDK.getSelectedBridge();
-        List<PHLight> allLights = bridge.getResourceCache().getAllLights();
+        final List<PHLight> allLights = bridge.getResourceCache().getAllLights();
         totalRings = 0;
 
 
         if (Contacts.size() != 0) {
             for (final List<String[]> contact : Contacts) {
                 if (nameSplit[0].equals(contact.get(0)[0]) && nameSplit[1].equals(contact.get(0)[1])) {
-                    for (final PHLight light : allLights) {
-                        for (String lightName : contact.get(2)) {
-                            if (lightName.equals(light.getName())) {
-                                (new Thread() {
-                                    public void run() {
-                                        Timer timer = new Timer();
-                                        timer.schedule(new TimerTask() {
-                                            @Override
-                                            public void run() {
+                    (new Thread() {
+                        public void run() {
+                            Timer timer = new Timer();
+                            timer.schedule(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    for (final PHLight light : allLights) {
+                                        for (String lightName : contact.get(2)) {
+                                            if (lightName.equals(light.getName())) {
+
                                                 System.out.println("ticking");
                                                 System.out.println(totalRings);
-                                                if (totalRings == 10){
+                                                if (totalRings == 20) { //10 rings in total
                                                     System.out.println("timer cancelled");
                                                     cancel();
-                                                    if (!getCallAnswered()){
+                                                    if (!getCallAnswered()) {
                                                         simulateAMissedCall(contact.get(4));
+                                                        break;
                                                     }
+                                                    break;
                                                 }
                                                 if (!getCallAnswered()) {
                                                     PHLightState state = new PHLightState();
                                                     state.setOn(toggle);
-                                                    toggle = !toggle;
-                                                    bridge.updateLightState(light, state);
-                                                    System.out.println(light.getName() + " is on");
 
-                                                }
-                                                else{
+                                                    bridge.updateLightState(light, state);
+                                                    System.out.println(light.getName() + " is " + toggle);
+
+                                                } else {
+                                                    PHLightState state = new PHLightState();
+                                                    state.setOn(false);
+                                                    bridge.updateLightState(light, state);
                                                     System.out.println("call answered -- timer cancelled");
                                                     cancel();
                                                 }
-                                                totalRings++;
                                             }
-                                        }, 0, 1000);
+                                        }
                                     }
-                                }).start();
-                            }
+                                    toggle = !toggle;
+                                    totalRings++;
+                                }
+                            }, 0, 1000);
                         }
-                    }
+                    }).start();
                 }
             }
         }
@@ -474,6 +480,11 @@ public class HueController {
                     state.setOn(true);
                     bridge.updateLightState(light, state);
                     System.out.println(light.getName() + " is on - missed");
+                }
+                else{
+                    PHLightState state = new PHLightState();
+                    state.setOn(false);
+                    bridge.updateLightState(light, state);
                 }
             }
         }
