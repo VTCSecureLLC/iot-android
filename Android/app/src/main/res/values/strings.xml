@@ -46,7 +46,7 @@
     <string name="title_activity_configure_lights">Configure Lights</string>
     <string name="configure_lights">You may edit or rename your light(s) below.</string>
     <string name="title_activity_add_light">Add Light</string>
-    <string name="add_light_instruction">Make sure the new lights are off and tap search.</string>
+    <string name="add_light_instruction">Make sure the new lights are on and tap search.</string>
     <string name="btn_search">Search</string>
     <string name="title_activity_hue_default_values">Setting Default Values</string>
     <string name="default_values">The next step is to set the default values for your Hue system.</string>

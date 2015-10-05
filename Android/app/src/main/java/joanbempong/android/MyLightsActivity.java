@@ -11,6 +11,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.philips.lighting.hue.listener.PHLightListener;
+import com.philips.lighting.hue.sdk.PHAccessPoint;
 import com.philips.lighting.hue.sdk.PHHueSDK;
 import com.philips.lighting.model.PHBridge;
 import com.philips.lighting.model.PHBridgeResource;
@@ -23,12 +24,8 @@ import java.util.Map;
 public class MyLightsActivity extends AppCompatActivity {
     private PHHueSDK phHueSDK;
     private PHBridge bridge;
-    public static final String TAG = "ACE Notification";
-
     private EditLightAdapter adapter;
-
     private Button addBtn;
-
     private ProgressBar pbar;
     private static final int MAX_TIME=30;
 
@@ -38,6 +35,7 @@ public class MyLightsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_my_lights);
 
         phHueSDK = PHHueSDK.getInstance();
+        bridge = phHueSDK.getSelectedBridge();
 
         pbar = (ProgressBar) findViewById(R.id.countdownPB);
         pbar.setMax(MAX_TIME);
@@ -54,7 +52,7 @@ public class MyLightsActivity extends AppCompatActivity {
         });
 
 
-        bridge = phHueSDK.getSelectedBridge();
+        PHBridge bridge = phHueSDK.getSelectedBridge();
         List<PHLight> allLights = bridge.getResourceCache().getAllLights();
         adapter = new EditLightAdapter(this, allLights);
 
@@ -65,7 +63,6 @@ public class MyLightsActivity extends AppCompatActivity {
     public void addOnClick() {
         pbar.setVisibility(View.VISIBLE);
         addBtn.setText(R.string.search_progress);
-
         bridge.findNewLights(listener);
     }
 
@@ -107,36 +104,44 @@ public class MyLightsActivity extends AppCompatActivity {
         @Override
         public void onReceivingLights(List<PHBridgeResource> list) {
             System.out.println(list.size());
+
+            PHBridge bridge = phHueSDK.getSelectedBridge();
+
             if (list.size() != 0) {
                 for (PHBridgeResource br : list) {
                     System.out.println(br.getName());
                     System.out.println(br.getIdentifier());
-
                 }
+
+                // Try to disconnect and connect again to update the lights list
+                HueSharedPreferences prefs = HueSharedPreferences.getInstance(getApplicationContext());
+                PHAccessPoint connection = new PHAccessPoint();
+                connection.setIpAddress(prefs.getLastConnectedIPAddress());
+                connection.setUsername(prefs.getUsername());
+                phHueSDK.disconnect(bridge);
+                phHueSDK.connect(connection);
             }
+
             System.out.println("new light receiving");
             incrementProgress();
         }
 
         @Override
         public void onSearchComplete() {
-            System.out.println("updated light: ");
-
-            //PHBridge bridge = phHueSDK.getSelectedBridge();
-            List<PHLight> allLights = bridge.getResourceCache().getAllLights();
-            for (PHLight light : allLights){
-                System.out.println(light.getName());
-                System.out.println("inside loop");
-            }
-            System.out.println("outside loop");
-            pbar.setVisibility(View.GONE);
-            addBtn.setText(R.string.new_light);
             System.out.println("search is completed, navigating");
 
             // navigate to the AddLights page
             startActivity(new Intent(MyLightsActivity.this, MyLightsActivity.class));
         }
     };
+
+    //action to take when the back button is pressed
+    @Override
+    public void onBackPressed()
+    {
+        //navigate to the Home page
+        startActivity(new Intent(MyLightsActivity.this, SettingsActivity.class));
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -1,8 +1,8 @@
 package joanbempong.android;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,8 +15,9 @@ import com.philips.lighting.model.PHLight;
 
 import java.util.List;
 
-public class ConfigureLightsActivity extends AppCompatActivity {
+public class ConfigureLightsActivity extends Activity {
     private PHHueSDK phHueSDK;
+    private List<PHLight> allLights;
     public static final String TAG = "ACE Notification";
     private HueSharedPreferences prefs;
 
@@ -28,6 +29,14 @@ public class ConfigureLightsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_configure_lights);
 
         phHueSDK = PHHueSDK.getInstance();
+        PHBridge bridge = phHueSDK.getSelectedBridge();
+        allLights = bridge.getResourceCache().getAllLights();
+
+        allLights = bridge.getResourceCache().getAllLights();
+        adapter = new ConfigureLightAdapter(this, allLights);
+
+        ListView allLightsList = (ListView) findViewById(R.id.light_list);
+        allLightsList.setAdapter(adapter);
 
         Button nextBtn;
 
@@ -40,13 +49,6 @@ public class ConfigureLightsActivity extends AppCompatActivity {
             }
 
         });
-
-        PHBridge bridge = phHueSDK.getSelectedBridge();
-        List<PHLight> allLights = bridge.getResourceCache().getAllLights();
-        adapter = new ConfigureLightAdapter(this, allLights);
-
-        ListView allLightsList = (ListView) findViewById(R.id.light_list);
-        allLightsList.setAdapter(adapter);
 
         prefs = HueSharedPreferences.getInstance(getApplicationContext());
         System.out.println("bridge username: " +  prefs.getUsername());

@@ -7,9 +7,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ProgressBar;
 
 import com.philips.lighting.hue.listener.PHLightListener;
+import com.philips.lighting.hue.sdk.PHAccessPoint;
 import com.philips.lighting.hue.sdk.PHHueSDK;
 import com.philips.lighting.model.PHBridge;
 import com.philips.lighting.model.PHBridgeResource;
@@ -21,24 +21,13 @@ import java.util.Map;
 
 public class AddLightSetupActivity extends Activity {
     private PHHueSDK phHueSDK;
-    private ProgressBar pbar;
-    private static final int MAX_TIME=60;
-    private boolean isDialogShowing;
-    private PHBridge bridge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_light_setup);
 
-
-        isDialogShowing=false;
-
         phHueSDK = PHHueSDK.getInstance();
-
-        pbar = (ProgressBar) findViewById(R.id.countdownPB);
-        pbar.setMax(MAX_TIME);
-
 
         Button searchBtn;
 
@@ -49,22 +38,20 @@ public class AddLightSetupActivity extends Activity {
             public void onClick(View v) {
                 searchOnClick();
             }
-
         });
-
-
     }
 
     public void searchOnClick() {
         System.out.println("current light: ");
 
-        bridge = phHueSDK.getSelectedBridge();
+        PHBridge bridge = phHueSDK.getSelectedBridge();
         List<PHLight> allLights = bridge.getResourceCache().getAllLights();
         for (PHLight light : allLights){
             System.out.println(light.getName());
         }
 
         PHWizardAlertDialog.getInstance().showProgressDialog(R.string.search_progress, AddLightSetupActivity.this);
+        // find new light lstener which uses onReceivingLightDetails
         bridge.findNewLights(listener);
     }
 
@@ -88,10 +75,6 @@ public class AddLightSetupActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void incrementProgress() {
-        pbar.incrementProgressBy(1);
     }
 
     // If you want to handle the response from the bridge, create a PHLightListener object.
@@ -122,33 +105,28 @@ public class AddLightSetupActivity extends Activity {
         @Override
         public void onReceivingLights(List<PHBridgeResource> list) {
             System.out.println(list.size());
+
+            PHBridge bridge = phHueSDK.getSelectedBridge();
+
             if (list.size() != 0) {
                 for (PHBridgeResource br : list) {
                     System.out.println(br.getName());
                     System.out.println(br.getIdentifier());
-
-                    //works but an error is received:
-                    //Attempt to invoke virtual method 'com.philips.lighting.model.PHLightState com.philips.lighting.model.PHLight.getLastKnownLightState()' on a null object reference
-                    /*PHLightState state = new PHLightState();
-                    state.setOn(true);
-                    bridge.updateLightState(br.getIdentifier(), state, listener);*/
-
-                    System.out.println("light should be on");
                 }
+
+                // Try to disconnect and connect again to update the lights list
+                HueSharedPreferences prefs = HueSharedPreferences.getInstance(getApplicationContext());
+                PHAccessPoint connection = new PHAccessPoint();
+                connection.setIpAddress(prefs.getLastConnectedIPAddress());
+                connection.setUsername(prefs.getUsername());
+                phHueSDK.disconnect(bridge);
+                phHueSDK.connect(connection);
             }
             System.out.println("new light receiving");
-            incrementProgress();
         }
 
         @Override
         public void onSearchComplete() {
-            System.out.println("updated light: ");
-
-            List<PHLight> allLights = bridge.getResourceCache().getAllLights();
-            for (PHLight light : allLights){
-                System.out.println(light.getName());
-            }
-
             System.out.println("search is completed, navigating");
 
             // navigate to the AddLights page

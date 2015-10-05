@@ -67,6 +67,7 @@ public class LightListControlAdapter extends BaseAdapter{
         final PHLightState state = new PHLightState();
 
         final SeekBar seekBar = (SeekBar) convertView.findViewById(R.id.seekBar);
+        int currentBright = 0;
 
         final Button redBtn = (Button)convertView.findViewById(R.id.redBtn);
         final Button orangeBtn = (Button)convertView.findViewById(R.id.orangeBtn);
@@ -162,14 +163,28 @@ public class LightListControlAdapter extends BaseAdapter{
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                int lightBright = seekBar.getProgress();
+                state.setBrightness(lightBright);
+                state.setOn(true);
+                bridge.updateLightState(light, state);
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                int lightBright = seekBar.getProgress();
+                state.setBrightness(lightBright);
+                state.setOn(true);
+                bridge.updateLightState(light, state);
             }
         });
+
+        for (PHLight l : allLights){
+            if (listItemText.getText().equals(l.getName())){
+                currentBright = l.getLastKnownLightState().getBrightness();
+                break;
+            }
+        }
+        seekBar.setProgress(currentBright);
 
         return convertView;
     }

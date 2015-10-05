@@ -147,6 +147,14 @@ public class HueController {
         missedCallLights = new ArrayList<>();
     }
 
+    public boolean getToggle(){
+        return this.toggle;
+    }
+
+    public void setToggle(){
+        this.toggle = !this.toggle;
+    }
+
     public List<String> getIncomingCallLights(){
         return this.incomingCallLights;
     }
@@ -441,7 +449,9 @@ public class HueController {
                                                 if (!getCallAnswered()) {
                                                     PHLightState state = new PHLightState();
                                                     state.setOn(toggle);
-
+                                                    //state.setBrightness(255);
+                                                    bridge.updateLightState(light, state);
+                                                    state.setBrightness(255);
                                                     bridge.updateLightState(light, state);
                                                     System.out.println(light.getName() + " is " + toggle);
 
@@ -478,6 +488,7 @@ public class HueController {
                 if (lightName.equals(light.getName())) {
                     PHLightState state = new PHLightState();
                     state.setOn(true);
+                    state.setBrightness(255);
                     bridge.updateLightState(light, state);
                     System.out.println(light.getName() + " is on - missed");
                 }
