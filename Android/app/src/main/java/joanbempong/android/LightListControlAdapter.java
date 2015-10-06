@@ -30,6 +30,10 @@ public class LightListControlAdapter extends BaseAdapter{
     int purple = 50100;
     int pink = 61100;
 
+
+    private PHHueSDK phHueSDK = PHHueSDK.create();
+    private PHBridge bridge = phHueSDK.getSelectedBridge();
+
     /**
      * creates instance of {@link LightListAdapter} class.
      *
@@ -60,6 +64,26 @@ public class LightListControlAdapter extends BaseAdapter{
         final TextView listItemText = (TextView) convertView.findViewById(R.id.lightName);
         final PHLight light = allLights.get(position);
         listItemText.setText(light.getName());
+
+        listItemText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println(listItemText.getText() + " was clicked");
+                for (PHLight l : allLights) {
+                    if (l.getName().equals(listItemText.getText())) {
+                        if (l.getLastKnownLightState().isOn()) {
+                            PHLightState state = new PHLightState();
+                            state.setOn(false);
+                            bridge.updateLightState(l, state);
+                        } else {
+                            PHLightState state = new PHLightState();
+                            state.setOn(true);
+                            bridge.updateLightState(l, state);
+                        }
+                    }
+                }
+            }
+        });
 
         PHHueSDK phHueSDK;
         phHueSDK = PHHueSDK.create();

@@ -29,12 +29,10 @@ public class ConfigureLightsActivity extends Activity {
         setContentView(R.layout.activity_configure_lights);
 
         phHueSDK = PHHueSDK.getInstance();
+
         PHBridge bridge = phHueSDK.getSelectedBridge();
         allLights = bridge.getResourceCache().getAllLights();
-
-        allLights = bridge.getResourceCache().getAllLights();
         adapter = new ConfigureLightAdapter(this, allLights);
-
         ListView allLightsList = (ListView) findViewById(R.id.light_list);
         allLightsList.setAdapter(adapter);
 

@@ -54,8 +54,8 @@
     <string name="missed_call">Missed Call</string>
     <string name="light_choice">Light(s)</string>
     <string name="flash_pattern">Flash Pattern</string>
-    <string name="flash_rate">Flash Rate</string>
-    <string name="duration">Duration</string>
+    <string name="flash_rate">Flash Rate (in seconds)</string>
+    <string name="duration">Duration (in minutes)</string>
     <string-array name="flash_pattern_list">
         <item>--</item>
         <item>Slow</item>
@@ -64,19 +64,20 @@
     </string-array>
     <string-array name="flash_rate_list">
         <item>--</item>
-        <item>5 second</item>
-        <item>1 second</item>
-        <item>1.5 seconds</item>
-        <item>2 seconds</item>
+        <item>.5</item>
+        <item>1</item>
+        <item>1.5</item>
+        <item>2</item>
     </string-array>
     <string-array name="duration_list">
         <item>--</item>
-        <item>5 minutes</item>
-        <item>10 minutes</item>
-        <item>15 minutes</item>
-        <item>30 minutes</item>
-        <item>45 minutes</item>
-        <item>60 minutes</item>
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>30</item>
+        <item>45</item>
+        <item>60</item>
         <item>Always On</item>
     </string-array>
     <string name="title_activity_contact_list_default">Assigning Default Values</string>
@@ -101,8 +102,8 @@
     <string name="title_activity_my_lights">My Lights</string>
     <string name="new_light">+ new light</string>
     <string name="title_activity_add_light_setup">Add Light</string>
-
-    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_on_call">OnCallActivity</string>
+    <string name="btn_hang_up">Hang Up</string>
 
 
 </resources>

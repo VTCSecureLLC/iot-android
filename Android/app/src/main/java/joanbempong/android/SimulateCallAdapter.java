@@ -3,6 +3,7 @@ package joanbempong.android;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,8 @@ public class SimulateCallAdapter extends BaseAdapter {
     private PHBridge bridge = phHueSDK.getSelectedBridge();
     private List<PHLight> allLights = bridge.getResourceCache().getAllLights();
     int totalRings = 0;
+    private int MAX_TOTAL_RINGS = 0;
+    private int LONG_PERIOD = 0;
 
     /**
      * creates instance of {@link LightListAdapter} class.
@@ -65,7 +68,6 @@ public class SimulateCallAdapter extends BaseAdapter {
         //Handle TextView and display string from your list
         final TextView listItemText = (TextView) view.findViewById(R.id.list_item_string);
         listItemText.setText(myList.get(position));
-        //System.out.println(listItemText.getText());
 
         //String[] nameSplit = listItemText.getText)_.toString().split("\\s+");
 
@@ -75,6 +77,8 @@ public class SimulateCallAdapter extends BaseAdapter {
         simulateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                controller.saveAllLightStates();
+
                 totalRings = 0;
                 controller.setCallAnswered(false);
                 //creates a new alert dialog
@@ -85,12 +89,15 @@ public class SimulateCallAdapter extends BaseAdapter {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         controller.setCallAnswered(true);
+                        // navigate to the MyContacts page
+                        context.startActivity(new Intent(context, OnCallActivity.class));
                     }
                 });
 
                 alert.setNegativeButton("Decline", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        controller.restoreAllLightStates();
                         controller.setCallAnswered(true);
                     }
                 });
@@ -110,6 +117,9 @@ public class SimulateCallAdapter extends BaseAdapter {
                 if (controller.getContactList().size() != 0) {
                     for (final List<String[]> contact : controller.getContactList()) {
                         if (nameSplit[0].equals(contact.get(0)[0]) && nameSplit[1].equals(contact.get(0)[1])) {
+                            double flashRate = Double.parseDouble(contact.get(3)[1]);
+                            MAX_TOTAL_RINGS = (int)((10/flashRate)*2);
+                            LONG_PERIOD = (int)(flashRate * 1000);
                             (new Thread() {
                                 public void run() {
                                     Timer timer = new Timer();
@@ -119,17 +129,15 @@ public class SimulateCallAdapter extends BaseAdapter {
                                             for (final PHLight light : allLights) {
                                                 for (String lightName : contact.get(2)) {
                                                     if (lightName.equals(light.getName())) {
-
                                                         System.out.println("ticking");
                                                         System.out.println(totalRings);
-                                                        if (totalRings == 20) { //10 rings in total
+                                                        if (totalRings == MAX_TOTAL_RINGS) { //10 rings in total
+                                                            if (!controller.getCallAnswered()) {
+                                                                controller.simulateAMissedCall(contact.get(4), contact.get(5)[0]);
+                                                                dialog.cancel();
+                                                            }
                                                             System.out.println("timer cancelled");
                                                             cancel();
-                                                            if (!controller.getCallAnswered()) {
-                                                                controller.simulateAMissedCall(contact.get(4));
-                                                                dialog.cancel();
-                                                                break;
-                                                            }
                                                             break;
                                                         }
                                                         if (!controller.getCallAnswered()) {
@@ -141,10 +149,10 @@ public class SimulateCallAdapter extends BaseAdapter {
                                                             System.out.println(light.getName() + " is " + controller.getToggle());
 
                                                         } else {
-                                                            PHLightState state = new PHLightState();
+                                                            /*PHLightState state = new PHLightState();
                                                             state.setOn(false);
-                                                            bridge.updateLightState(light, state);
-                                                            System.out.println("call answered -- timer cancelled");
+                                                            bridge.updateLightState(light, state);*/
+                                                            System.out.println("call answered/declined -- timer cancelled");
                                                             cancel();
                                                         }
                                                     }
@@ -153,7 +161,7 @@ public class SimulateCallAdapter extends BaseAdapter {
                                             controller.setToggle();
                                             totalRings++;
                                         }
-                                    }, 0, 1000);
+                                    }, 0, LONG_PERIOD);
                                 }
                             }).start();
                         }

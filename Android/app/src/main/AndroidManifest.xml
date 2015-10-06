@@ -8,10 +8,6 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <android:uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <android:uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -49,10 +45,6 @@
         <activity
             android:name=".ConfigureLightsActivity"
             android:label="@string/title_activity_configure_lights" >
-        </activity>
-        <activity
-            android:name=".AddLightActivity"
-            android:label="@string/title_activity_add_light" >
         </activity>
         <activity
             android:name=".HueDefaultValuesActivity"
@@ -93,6 +85,10 @@
         <activity
             android:name=".AddLightSetupActivity"
             android:label="@string/title_activity_add_light_setup" >
+        </activity>
+        <activity
+            android:name=".OnCallActivity"
+            android:label="@string/title_activity_on_call" >
         </activity>
     </application>
 

@@ -1,7 +1,6 @@
 package joanbempong.android;
 
 import com.philips.lighting.hue.sdk.PHHueSDK;
-import com.philips.lighting.hue.sdk.util.PHHueCountTimer;
 import com.philips.lighting.model.PHBridge;
 import com.philips.lighting.model.PHLight;
 import com.philips.lighting.model.PHLightState;
@@ -29,11 +28,6 @@ public class HueController {
     private List<String> incomingCallDefaultLights = new ArrayList<>();
     private List<String> missedCallDefaultLights = new ArrayList<>();
 
-    //nondefault values for incoming and missed calls
-    private List<String> IncomingLight, MissedLight;
-    private String IncomingFlashPattern, IncomingFlashRate;
-    private String MissedDuration;
-
     private List<String> incomingCallLights = new ArrayList<>();
     private List<String> missedCallLights = new ArrayList<>();
 
@@ -56,9 +50,16 @@ public class HueController {
     private String[] oldContactMissedDuration;
 
 
-    private PHHueCountTimer timer = null;
+    //current light states
+    private List<List<String>> LightStates = new ArrayList<>();
+    private List<String> LightState;
+    private String brightness;
+    private String isOn;
+    private String color;
+
     private boolean toggle = false;
     private int totalRings = 0;
+    private int totalDuration = 0;
     private boolean callAnswered = false;
 
 
@@ -441,7 +442,7 @@ public class HueController {
                                                     System.out.println("timer cancelled");
                                                     cancel();
                                                     if (!getCallAnswered()) {
-                                                        simulateAMissedCall(contact.get(4));
+                                                        simulateAMissedCall(contact.get(4), contact.get(5)[0]);
                                                         break;
                                                     }
                                                     break;
@@ -477,26 +478,135 @@ public class HueController {
 
     }
 
-    public void simulateAMissedCall(String[] missedCallList){
+    public void simulateAMissedCall(final String[] missedCallList, final String duration) {
+        final int MAX_DURATION = Integer.parseInt(duration) * 60;
         PHHueSDK phHueSDK;
         phHueSDK = PHHueSDK.create();
-        PHBridge bridge = phHueSDK.getSelectedBridge();
-        List<PHLight> allLights = bridge.getResourceCache().getAllLights();
+        totalDuration = 0;
+        final PHBridge bridge = phHueSDK.getSelectedBridge();
+        final List<PHLight> allLights = bridge.getResourceCache().getAllLights();
 
-        for (PHLight light : allLights) {
+        for (final PHLight light : allLights) {
+            PHLightState state = new PHLightState();
+            state.setOn(false);
+            bridge.updateLightState(light, state);
+        }
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        for (final PHLight light : allLights) {
             for (String lightName : missedCallList) {
                 if (lightName.equals(light.getName())) {
-                    PHLightState state = new PHLightState();
-                    state.setOn(true);
-                    state.setBrightness(255);
-                    bridge.updateLightState(light, state);
-                    System.out.println(light.getName() + " is on - missed");
+                    PHLightState newState = new PHLightState();
+                    newState.setOn(true);
+                    bridge.updateLightState(light, newState);
+                    newState.setBrightness(255);
+                    bridge.updateLightState(light, newState);
+                    System.out.println(light.getName() + " is " + light.getLastKnownLightState().isOn() + " - missed");
                 }
-                else{
+            }
+        }
+
+        (new Thread() {
+            public void run() {
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        System.out.println("ticking");
+                        System.out.println(totalDuration);
+                        System.out.println(MAX_DURATION);
+                        if (totalDuration == MAX_DURATION) { //10 rings in total
+                            /*for (final PHLight light : allLights) {
+                                for (String lightName : missedCallList) {
+                                    if (lightName.equals(light.getName())) {
+                                        PHLightState state = new PHLightState();
+                                        state.setOn(false);
+                                        bridge.updateLightState(light, state);
+                                        System.out.println("timer cancelled -- light turned off");
+                                    }
+                                }
+                            }*/
+                            restoreAllLightStates();
+                            cancel();
+                        } else {
+                            totalDuration++;
+                        }
+                    }
+                }, 0, 1000);
+            }
+        }).start();
+    }
+
+    public void saveAllLightStates(){
+        System.out.println("saving all light states");
+        LightStates = new ArrayList<>();
+        PHHueSDK phHueSDK = PHHueSDK.getInstance();
+        PHBridge bridge = phHueSDK.getSelectedBridge();
+        List<PHLight> allLights = bridge.getResourceCache().getAllLights();
+        for (PHLight light : allLights){
+            brightness = String.valueOf(light.getLastKnownLightState().getBrightness());
+            isOn = String.valueOf(light.getLastKnownLightState().isOn());
+            if (light.supportsColor()){
+                color = String.valueOf(light.getLastKnownLightState().getHue());
+            }
+            else{
+                color = "null";
+            }
+            System.out.println(brightness);
+            System.out.println(isOn);
+            System.out.println(color);
+            LightState = new ArrayList<>();
+            LightState.add(light.getIdentifier());
+            LightState.add(brightness);
+            LightState.add(isOn);
+            LightState.add(color);
+            LightStates.add(LightState);
+        }
+    }
+
+    public void restoreAllLightStates(){
+        System.out.println("restoring all light states");
+        PHHueSDK phHueSDK = PHHueSDK.getInstance();
+        PHBridge bridge = phHueSDK.getSelectedBridge();
+        List<PHLight> allLights = bridge.getResourceCache().getAllLights();
+        for (PHLight light : allLights){
+            for (List<String> lightState : LightStates){
+                if (light.getIdentifier().equals(lightState.get(0))){
                     PHLightState state = new PHLightState();
-                    state.setOn(false);
+                    state.setBrightness(Integer.parseInt(lightState.get(1)));
                     bridge.updateLightState(light, state);
+                    state.setOn(Boolean.parseBoolean(lightState.get(2)));
+                    bridge.updateLightState(light, state);
+                    if (!lightState.get(3).equals("null")) {
+                        state.setHue(Integer.parseInt(lightState.get(3)));
+                        bridge.updateLightState(light, state);
+                    }
                 }
+            }
+        }
+    }
+
+    public void turnOnOnCallLights(){
+        System.out.println("turning on on call lights");
+
+        PHHueSDK phHueSDK = PHHueSDK.getInstance();
+        PHBridge bridge = phHueSDK.getSelectedBridge();
+        List<PHLight> allLights = bridge.getResourceCache().getAllLights();
+        for (PHLight light : allLights){
+            System.out.println(light.getName());
+            PHLightState state = new PHLightState();
+            state.setOn(true);
+            bridge.updateLightState(light, state);
+            state.setBrightness(255);
+            bridge.updateLightState(light, state);
+            if (light.supportsColor()){
+                state.setHue(0);
+                bridge.updateLightState(light, state);
             }
         }
     }
