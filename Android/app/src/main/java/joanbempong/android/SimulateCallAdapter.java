@@ -117,53 +117,87 @@ public class SimulateCallAdapter extends BaseAdapter {
                 if (controller.getContactList().size() != 0) {
                     for (final List<String[]> contact : controller.getContactList()) {
                         if (nameSplit[0].equals(contact.get(0)[0]) && nameSplit[1].equals(contact.get(0)[1])) {
-                            double flashRate = Double.parseDouble(contact.get(3)[1]);
-                            MAX_TOTAL_RINGS = (int)((10/flashRate)*2);
-                            LONG_PERIOD = (int)(flashRate * 1000);
-                            (new Thread() {
-                                public void run() {
-                                    Timer timer = new Timer();
-                                    timer.schedule(new TimerTask() {
-                                        @Override
-                                        public void run() {
-                                            for (final PHLight light : allLights) {
-                                                for (String lightName : contact.get(2)) {
-                                                    if (lightName.equals(light.getName())) {
-                                                        System.out.println("ticking");
-                                                        System.out.println(totalRings);
-                                                        if (totalRings == MAX_TOTAL_RINGS) { //10 rings in total
-                                                            if (!controller.getCallAnswered()) {
-                                                                controller.simulateAMissedCall(contact.get(4), contact.get(5)[0]);
-                                                                dialog.cancel();
-                                                            }
-                                                            System.out.println("timer cancelled");
-                                                            cancel();
-                                                            break;
-                                                        }
-                                                        if (!controller.getCallAnswered()) {
-                                                            PHLightState state = new PHLightState();
-                                                            state.setOn(controller.getToggle());
-                                                            bridge.updateLightState(light, state);
-                                                            state.setBrightness(255);
-                                                            bridge.updateLightState(light, state);
-                                                            System.out.println(light.getName() + " is " + controller.getToggle());
+                            String notif = contact.get(8)[0];
+                            if (notif.equals("yes")) {
+                                double flashRate = Double.parseDouble(contact.get(3)[1]);
+                                MAX_TOTAL_RINGS = (int) ((10 / flashRate) * 2);
+                                LONG_PERIOD = (int) (flashRate * 1000);
 
-                                                        } else {
+                                (new Thread() {
+                                    public void run() {
+                                        Timer timer = new Timer();
+                                        timer.schedule(new TimerTask() {
+                                            @Override
+                                            public void run() {
+                                                for (final PHLight light : allLights) {
+                                                    for (String lightName : contact.get(2)) {
+                                                        if (lightName.equals(light.getName())) {
+                                                            System.out.println("ticking");
+                                                            System.out.println(totalRings);
+                                                            if (totalRings == MAX_TOTAL_RINGS) { //lasts for 20 seconds
+                                                                if (!controller.getCallAnswered()) {
+                                                                    controller.simulateAMissedCall(contact.get(4), contact.get(5)[0]);
+                                                                    dialog.cancel();
+                                                                }
+                                                                System.out.println("timer cancelled");
+                                                                cancel();
+                                                                break;
+                                                            }
+                                                            if (!controller.getCallAnswered()) {
+                                                                PHLightState state = new PHLightState();
+                                                                state.setOn(controller.getToggle());
+                                                                bridge.updateLightState(light, state);
+                                                                state.setBrightness(255);
+                                                                bridge.updateLightState(light, state);
+                                                                System.out.println(light.getName() + " is " + controller.getToggle());
+
+                                                            } else {
                                                             /*PHLightState state = new PHLightState();
                                                             state.setOn(false);
                                                             bridge.updateLightState(light, state);*/
-                                                            System.out.println("call answered/declined -- timer cancelled");
-                                                            cancel();
+                                                                System.out.println("call answered/declined -- timer cancelled");
+                                                                cancel();
+                                                            }
                                                         }
                                                     }
                                                 }
+                                                controller.setToggle();
+                                                totalRings++;
                                             }
-                                            controller.setToggle();
-                                            totalRings++;
-                                        }
-                                    }, 0, LONG_PERIOD);
-                                }
-                            }).start();
+                                        }, 0, LONG_PERIOD);
+                                    }
+                                }).start();
+                            }
+                            else{ //do the same thing but no notification
+                                double flashRate = 1;
+                                MAX_TOTAL_RINGS = (int) ((10 / flashRate) * 2);
+                                LONG_PERIOD = (int) (flashRate * 1000);
+
+                                (new Thread() {
+                                    public void run() {
+                                        Timer timer = new Timer();
+                                        timer.schedule(new TimerTask() {
+                                            @Override
+                                            public void run() {
+                                                System.out.println("ticking");
+                                                System.out.println(totalRings);
+                                                if (totalRings == MAX_TOTAL_RINGS) { //20 rings in total
+                                                    if (!controller.getCallAnswered()) {
+                                                        dialog.cancel();
+                                                    }
+                                                    System.out.println("timer cancelled");
+                                                    cancel();
+                                                }
+                                                if (controller.getCallAnswered()) {
+                                                    System.out.println("call answered/declined -- timer cancelled");
+                                                    cancel();
+                                                }
+                                                totalRings++;
+                                            }
+                                        }, 0, LONG_PERIOD);
+                                    }
+                                }).start();
+                            }
                         }
                     }
                 }

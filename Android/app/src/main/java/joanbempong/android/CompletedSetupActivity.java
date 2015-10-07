@@ -1,8 +1,8 @@
 package joanbempong.android;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +27,8 @@ public class CompletedSetupActivity extends AppCompatActivity {
     View.OnClickListener takeMeHomeBtnOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View arg0) {
+            SetupController setupController = SetupController.getInstance();
+            setupController.setSetupCompleted(true);
             //navigate to the HomeActivity page
             startActivity(new Intent(CompletedSetupActivity.this, HomeActivity.class));
         }

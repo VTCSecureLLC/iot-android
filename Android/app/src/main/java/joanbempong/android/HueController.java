@@ -16,14 +16,17 @@ import java.util.TimerTask;
  */
 public class HueController {
     //declaring variables
-
-
     private static HueController instance = null;
 
     //default values for incoming and missed calls
     private List<String> defaultIncomingLight, defaultMissedLight;
     private String defaultIncomingFlashPattern, defaultIncomingFlashRate;
     private String defaultMissedDuration;
+
+    //old default values for incoming and missed calls
+    private List<String> oldDefaultIncomingLight, oldDefaultMissedLight;
+    private String oldDefaultIncomingFlashPattern, oldDefaultIncomingFlashRate;
+    private String oldDefaultMissedDuration;
 
     private List<String> incomingCallDefaultLights = new ArrayList<>();
     private List<String> missedCallDefaultLights = new ArrayList<>();
@@ -40,6 +43,9 @@ public class HueController {
     private String[] ContactIncomingCallFlash;
     private String[] ContactMissedCallLight;
     private String[] ContactMissedCallDuration;
+    private String[] ContactIncomingCallUseDefault;
+    private String[] ContactMissedCallUseDefault;
+    private String[] ContactNotificationYN;
 
     //old contact information
     private String[] oldContactName;
@@ -47,7 +53,10 @@ public class HueController {
     private String[] oldContactIncomingCallFlash;
     private String[] oldContactIncomingCallLight;
     private String[] oldContactMissedCallLight;
-    private String[] oldContactMissedDuration;
+    private String[] oldContactMissedCallDuration;
+    private String[] oldContactIncomingCallUseDefault;
+    private String[] oldContactMissedCallUseDefault;
+    private String[] oldContactNotificationYN;
 
 
     //current light states
@@ -61,6 +70,7 @@ public class HueController {
     private int totalRings = 0;
     private int totalDuration = 0;
     private boolean callAnswered = false;
+    private boolean defaultValues = false;
 
 
 
@@ -82,12 +92,12 @@ public class HueController {
 
     public void addToIncomingCallDefaultLights(String name){
         incomingCallDefaultLights.add(name);
-        System.out.println(name + "added successfully");
+        System.out.println(name + " added successfully (incoming -- default)");
     }
 
     public void addToMissedCallDefaultLights(String name){
         missedCallDefaultLights.add(name);
-        System.out.println(name + "added successfully");
+        System.out.println(name + " added successfully (missed -- default)");
     }
 
     public void removeFromIncomingCallDefaultLights(String name){
@@ -95,7 +105,7 @@ public class HueController {
             String lightName = iter.next();
             if (lightName.equals(name)){
                 iter.remove();
-                System.out.println(lightName + "removed successfully");
+                System.out.println(lightName + " removed successfully (incoming)");
             }
         }
     }
@@ -105,19 +115,19 @@ public class HueController {
             String lightName = iter.next();
             if (lightName.equals(name)){
                 iter.remove();
-                System.out.println(lightName + "removed successfully");
+                System.out.println(lightName + " removed successfully (missed)");
             }
         }
     }
 
     public void addToIncomingCallLightsList(String name){
         incomingCallLights.add(name);
-        System.out.println(name + "added successfully");
+        System.out.println(name + " added successfully (incoming)");
     }
 
     public void addToMissedCallLightsList(String name){
         missedCallLights.add(name);
-        System.out.println(name + "added successfully");
+        System.out.println(name + " added successfully (missed)");
     }
 
     public void removeFromIncomingCallLightsList(String name){
@@ -182,7 +192,19 @@ public class HueController {
     }
 
     public String[] getOldContactMissedDuration(){
-        return this.oldContactMissedDuration;
+        return this.oldContactMissedCallDuration;
+    }
+
+    public String[] getOldContactIncomingCallUseDefault(){
+        return this.oldContactIncomingCallUseDefault;
+    }
+
+    public String[] getOldContactMissedCallUseDefault(){
+        return this.oldContactMissedCallUseDefault;
+    }
+
+    public String[] getOldContactNotificationYN(){
+        return this.oldContactNotificationYN;
     }
 
 
@@ -218,6 +240,14 @@ public class HueController {
         return this.defaultMissedDuration;
     }
 
+    public List<String> getOldDefaultIncomingLight(){
+        return this.oldDefaultIncomingLight;
+    }
+
+    public List<String> getOldDefaultMissedLight(){
+        return this.oldDefaultMissedLight;
+    }
+
     public List<List<String[]>> getContactList(){
         return this.Contacts;
     }
@@ -230,17 +260,31 @@ public class HueController {
         this.callAnswered = b;
     }
 
-    //save default values for incoming calls
-    public void saveDefaultIncomingCall(String flashPattern, String flashRate){
+    public boolean getDefaultValues(){return this.defaultValues;}
+
+    public void setDefaultValues(boolean b){this.defaultValues = b;}
+
+    //save default values
+    public void saveDefaultValues(String flashPattern, String flashRate, String duration){
         defaultIncomingLight = this.incomingCallDefaultLights;
         defaultIncomingFlashPattern = flashPattern;
         defaultIncomingFlashRate = flashRate;
-    }
-
-    //save default values for missed calls
-    public void saveDefaultMissedCall(String duration){
         defaultMissedLight = this.missedCallDefaultLights;
         defaultMissedDuration = duration;
+    }
+
+    public void setCleanDefaultValues(){
+        incomingCallDefaultLights = new ArrayList<>();
+        missedCallDefaultLights = new ArrayList<>();
+    }
+
+   //save current default values
+    public void saveCurrentDefaultValues(){
+        oldDefaultIncomingLight = defaultIncomingLight;
+        oldDefaultIncomingFlashPattern = defaultIncomingFlashPattern;
+        oldDefaultIncomingFlashRate = defaultIncomingFlashRate;
+        oldDefaultMissedLight = defaultMissedLight;
+        oldDefaultMissedDuration = defaultMissedDuration;
     }
 
     public void createNewContact(String firstName, String lastName, String phoneNumber,
@@ -248,7 +292,10 @@ public class HueController {
                                  String incomingCallFlashPattern,
                                  String incomingCallFlashRate,
                                  List<String> missedCallLight,
-                                 String missedCallDuration){
+                                 String missedCallDuration,
+                                 String incomingCallUseDefault,
+                                 String missedCallUseDefault,
+                                 String notificationYN){
 
         ContactName = new String[2];
         ContactName[0] = firstName;
@@ -296,6 +343,15 @@ public class HueController {
         ContactMissedCallDuration = new String[1];
         ContactMissedCallDuration[0] = missedCallDuration;
 
+        ContactIncomingCallUseDefault = new String[1];
+        ContactIncomingCallUseDefault[0] = incomingCallUseDefault;
+
+        ContactMissedCallUseDefault = new String[1];
+        ContactMissedCallUseDefault[0] = missedCallUseDefault;
+
+        ContactNotificationYN = new String[1];
+        ContactNotificationYN[0] = notificationYN;
+
         //create a new contact
         Contact = new ArrayList<>();
         Contact.add(ContactName);
@@ -304,11 +360,14 @@ public class HueController {
         Contact.add(ContactIncomingCallFlash);
         Contact.add(ContactMissedCallLight);
         Contact.add(ContactMissedCallDuration);
+        Contact.add(ContactIncomingCallUseDefault);
+        Contact.add(ContactMissedCallUseDefault);
+        Contact.add(ContactNotificationYN);
 
         //add to the list of contacts
         Contacts.add(Contact);
 
-        System.out.println("New Contact : " +
+        /*System.out.println("New Contact : " +
                 "\nFirst Name : " + Contact.get(0)[0] +
                 "\nLast Name : " + Contact.get(0)[1] +
                 "\nPhone Number : " + Contact.get(1)[0] +
@@ -316,7 +375,10 @@ public class HueController {
                 "\nIncoming Call Flash Pattern : " + Contact.get(3)[0] +
                 "\nIncoming Call Flash Rate : " + Contact.get(3)[1] +
                 "\nMissed Call Light : " +
-                "\nMissed Call Duration : " + Contact.get(5)[0]);
+                "\nMissed Call Duration : " + Contact.get(5)[0]+
+                "\nUse Incoming Default : " + Contact.get(6)[0]+
+                "\nUse Missed Default : " + Contact.get(7)[0] +
+                "\nUse Notification : " + Contact.get(8)[0]);*/
     }
 
     public void saveCurrentInformation(String firstName, String lastName){
@@ -330,7 +392,10 @@ public class HueController {
                 oldContactIncomingCallLight = contact.get(2);
                 oldContactIncomingCallFlash = contact.get(3);
                 oldContactMissedCallLight = contact.get(4);
-                oldContactMissedDuration = contact.get(5);
+                oldContactMissedCallDuration = contact.get(5);
+                oldContactIncomingCallUseDefault = contact.get(6);
+                oldContactMissedCallUseDefault = contact.get(7);
+                oldContactNotificationYN = contact.get(8);
             }
         }
     }
@@ -340,7 +405,10 @@ public class HueController {
                             String incomingCallFlashPattern,
                             String incomingCallFlashRate,
                             List<String> missedCallLight,
-                            String missedCallDuration){
+                            String missedCallDuration,
+                            String incomingCallUseDefault,
+                            String missedCallUseDefault,
+                            String notificationYN){
         //update the contact
         if (Contacts != null) {
             ContactName = new String[2];
@@ -363,8 +431,6 @@ public class HueController {
                 ContactIncomingCallLight[i] = lightName;
                 i++;
             }
-            /*ContactIncomingCallLight = new String[1];
-            ContactIncomingCallLight[0] = incomingCallLight;*/
 
             ContactIncomingCallFlash = new String[2];
             ContactIncomingCallFlash[0] = incomingCallFlashPattern;
@@ -383,12 +449,18 @@ public class HueController {
                 ContactMissedCallLight[i] = lightName;
                 i++;
             }
-            /*ContactMissedCallLight = new String[1];
-            ContactMissedCallLight[0] = missedCallLight;*/
 
             ContactMissedCallDuration = new String[1];
             ContactMissedCallDuration[0] = missedCallDuration;
 
+            ContactIncomingCallUseDefault = new String[1];
+            ContactIncomingCallUseDefault[0] = incomingCallUseDefault;
+
+            ContactMissedCallUseDefault = new String[1];
+            ContactMissedCallUseDefault[0] = missedCallUseDefault;
+
+            ContactNotificationYN = new String[1];
+            ContactNotificationYN[0] = notificationYN;
 
             for (List<String[]> contact : Contacts) {
                 if (contact.get(0)[0].equals(getOldContactName()[0]) && contact.get(0)[1].equals(getOldContactName()[1])) {
@@ -398,8 +470,11 @@ public class HueController {
                     contact.set(3, ContactIncomingCallFlash);
                     contact.set(4, ContactMissedCallLight);
                     contact.set(5, ContactMissedCallDuration);
+                    contact.set(6, ContactIncomingCallUseDefault);
+                    contact.set(7, ContactMissedCallUseDefault);
+                    contact.set(8, ContactNotificationYN);
 
-                    System.out.println("Edit Contact : " +
+                    /*System.out.println("Edit Contact : " +
                             "\nFirst Name : " + contact.get(0)[0] +
                             "\nLast Name : " + contact.get(0)[1] +
                             "\nPhone Number : " + contact.get(1)[0] +
@@ -407,7 +482,49 @@ public class HueController {
                             "\nIncoming Call Flash Pattern : " + contact.get(3)[0] +
                             "\nIncoming Call Flash Rate : " + contact.get(3)[1] +
                             "\nMissed Call Light : " + contact.get(4)[0] +
-                            "\nMissed Call Duration : " + contact.get(5)[0]);
+                            "\nMissed Call Duration : " + contact.get(5)[0]+
+                            "\nUse Incoming Default : " + contact.get(6)[0]+
+                            "\nUse Missed Default : " + contact.get(7)[0]+
+                            "\nUse Notification : " + Contact.get(8)[0]);*/
+                }
+            }
+        }
+    }
+
+    public void updateContacts(){
+        for (List<String[]> contact : getContactList()){
+            if (contact.get(8)[0].equals("yes")) {
+                if ((contact.get(6)[0].equals("yes")) && (contact.get(7)[0].equals("no"))) {
+                    List<String> listMissed = new ArrayList<>();
+                    for (String miss : contact.get(4)) {
+                        listMissed.add(miss);
+                    }
+                    editContact(contact.get(0)[0], contact.get(0)[1], contact.get(1)[0],
+                            getDefaultIncomingLight(), getDefaultIncomingFlashPattern(),
+                            getDefaultIncomingFlashRate(), listMissed,
+                            contact.get(5)[0], "yes", "no", "yes");
+                } else if ((contact.get(6)[0].equals("no")) && (contact.get(7)[0].equals("yes"))) {
+                    List<String> listIncoming = new ArrayList<>();
+                    for (String in : contact.get(2)) {
+                        listIncoming.add(in);
+                    }
+                    editContact(contact.get(0)[0], contact.get(0)[1], contact.get(1)[0],
+                            listIncoming, contact.get(3)[0],
+                            contact.get(3)[1], getDefaultMissedLight(),
+                            getDefaultMissedDuration(), "no", "yes", "yes");
+                } else if ((contact.get(6)[0].equals("yes")) && (contact.get(7)[0].equals("yes"))) {
+                    List<String> listIncoming = new ArrayList<>();
+                    for (String in : contact.get(4)) {
+                        listIncoming.add(in);
+                    }
+                    List<String> listMissed = new ArrayList<>();
+                    for (String miss : contact.get(4)) {
+                        listMissed.add(miss);
+                    }
+                    editContact(contact.get(0)[0], contact.get(0)[1], contact.get(1)[0],
+                            listIncoming, getDefaultIncomingFlashPattern(),
+                            getDefaultIncomingFlashRate(), listMissed,
+                            getDefaultMissedDuration(), "yes", "yes", "yes");
                 }
             }
         }
@@ -450,8 +567,6 @@ public class HueController {
                                                 if (!getCallAnswered()) {
                                                     PHLightState state = new PHLightState();
                                                     state.setOn(toggle);
-                                                    //state.setBrightness(255);
-                                                    bridge.updateLightState(light, state);
                                                     state.setBrightness(255);
                                                     bridge.updateLightState(light, state);
                                                     System.out.println(light.getName() + " is " + toggle);
@@ -506,7 +621,7 @@ public class HueController {
                     bridge.updateLightState(light, newState);
                     newState.setBrightness(255);
                     bridge.updateLightState(light, newState);
-                    System.out.println(light.getName() + " is " + light.getLastKnownLightState().isOn() + " - missed");
+                    System.out.println(light.getName() + " is on, missed");
                 }
             }
         }
@@ -521,16 +636,6 @@ public class HueController {
                         System.out.println(totalDuration);
                         System.out.println(MAX_DURATION);
                         if (totalDuration == MAX_DURATION) { //10 rings in total
-                            /*for (final PHLight light : allLights) {
-                                for (String lightName : missedCallList) {
-                                    if (lightName.equals(light.getName())) {
-                                        PHLightState state = new PHLightState();
-                                        state.setOn(false);
-                                        bridge.updateLightState(light, state);
-                                        System.out.println("timer cancelled -- light turned off");
-                                    }
-                                }
-                            }*/
                             restoreAllLightStates();
                             cancel();
                         } else {
@@ -579,13 +684,14 @@ public class HueController {
                 if (light.getIdentifier().equals(lightState.get(0))){
                     PHLightState state = new PHLightState();
                     state.setBrightness(Integer.parseInt(lightState.get(1)));
-                    bridge.updateLightState(light, state);
+                    System.out.println(Integer.parseInt(lightState.get(1)));
                     state.setOn(Boolean.parseBoolean(lightState.get(2)));
-                    bridge.updateLightState(light, state);
+                    System.out.println(Boolean.parseBoolean(lightState.get(2)));
                     if (!lightState.get(3).equals("null")) {
                         state.setHue(Integer.parseInt(lightState.get(3)));
-                        bridge.updateLightState(light, state);
+                        System.out.println(Integer.parseInt(lightState.get(3)));
                     }
+                    bridge.updateLightState(light, state);
                 }
             }
         }

@@ -20,6 +20,7 @@ public class MissedCallLightChoiceAdapter extends BaseAdapter {
     private List<PHLight> myChoices;
     private Context context;
     private HueController controller;
+    private String missedDefault;
 
     /**
      * creates instance of {@link LightListAdapter} class.
@@ -27,12 +28,14 @@ public class MissedCallLightChoiceAdapter extends BaseAdapter {
      * @param context   the Context object.
      * @param allLights an array list of {@link PHLight} object to display.
      */
-    public MissedCallLightChoiceAdapter(Context context, List<PHLight> allLights, HueController controller) {
+    public MissedCallLightChoiceAdapter(Context context, List<PHLight> allLights, HueController controller,
+                                        String missedDefault) {
         this.context = context;
         // Cache the LayoutInflate to avoid asking for a new one each time.
         mInflater = LayoutInflater.from(context);
         this.myChoices = allLights;
         this.controller = controller;
+        this.missedDefault = missedDefault;
     }
 
     /**
@@ -67,10 +70,24 @@ public class MissedCallLightChoiceAdapter extends BaseAdapter {
             }
         });
 
-        if (controller.getOldContactMissedCallLight() != null) {
-            for (String l : controller.getOldContactMissedCallLight()) {
-                if (lightName.getText().equals(l)) {
-                    lightName.setChecked(true);
+        if (missedDefault.equals("yes")){
+            if (controller.getDefaultMissedLight() != null) {
+                for (String l : controller.getDefaultMissedLight()) {
+                    if (lightName.getText().equals(l)) {
+                        lightName.setChecked(true);
+                        System.out.println("set selected: " + lightName.isChecked());
+                    }
+                    lightName.setEnabled(false);
+                }
+            }
+        }
+
+        else {
+            if (controller.getOldContactMissedCallLight() != null) {
+                for (String l : controller.getOldContactMissedCallLight()) {
+                    if (lightName.getText().equals(l)) {
+                        lightName.setChecked(true);
+                    }
                 }
             }
         }

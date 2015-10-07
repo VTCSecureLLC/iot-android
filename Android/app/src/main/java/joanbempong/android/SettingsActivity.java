@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    TextView contactClick, lightClick, deviceClick;
+    TextView contactClick, lightClick, deviceClick, notificationClick;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,11 +21,13 @@ public class SettingsActivity extends AppCompatActivity {
         contactClick = (TextView)findViewById(R.id.contactClick);
         lightClick = (TextView)findViewById(R.id.lightClick);
         deviceClick = (TextView)findViewById(R.id.deviceClick);
+        notificationClick = (TextView)findViewById(R.id.notificationClick);
 
         //creates on click listeners
         contactClick.setOnClickListener(contactClickOnClickListener);
         lightClick.setOnClickListener(lightClickOnClickListener);
         deviceClick.setOnClickListener(deviceClickOnClickListener);
+        notificationClick.setOnClickListener(notificationClickOnClickListener);
     }
 
     View.OnClickListener contactClickOnClickListener = new View.OnClickListener() {
@@ -49,6 +51,14 @@ public class SettingsActivity extends AppCompatActivity {
         public void onClick(View arg0) {
             //navigate to the MyDevices page
             //startActivity(new Intent(SettingsActivity.this, MyDevices.class));
+        }
+    };
+
+    View.OnClickListener notificationClickOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View arg0) {
+            //navigate to the SetHueDefaultValuesActivity page
+            startActivity(new Intent(SettingsActivity.this, SetHueDefaultValuesActivity.class));
         }
     };
 

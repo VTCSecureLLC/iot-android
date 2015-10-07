@@ -20,6 +20,7 @@ public class IncomingCallLightChoiceAdapter extends BaseAdapter {
     private List<PHLight> myChoices;
     private Context context;
     private HueController controller;
+    private String incomingDefault;
 
     /**
      * creates instance of {@link LightListAdapter} class.
@@ -27,12 +28,14 @@ public class IncomingCallLightChoiceAdapter extends BaseAdapter {
      * @param context   the Context object.
      * @param allLights an array list of {@link PHLight} object to display.
      */
-    public IncomingCallLightChoiceAdapter(Context context, List<PHLight> allLights, HueController controller) {
+    public IncomingCallLightChoiceAdapter(Context context, List<PHLight> allLights, HueController controller,
+                                          String incomingDefault) {
         this.context = context;
         // Cache the LayoutInflate to avoid asking for a new one each time.
         mInflater = LayoutInflater.from(context);
         this.myChoices = allLights;
         this.controller = controller;
+        this.incomingDefault = incomingDefault;
     }
 
     /**
@@ -67,13 +70,22 @@ public class IncomingCallLightChoiceAdapter extends BaseAdapter {
             }
         });
 
-        if (controller.getOldContactIncomingCallLight() != null) {
-            for (String l : controller.getOldContactIncomingCallLight()) {
-                System.out.println("checkbox name: " + lightName.getText());
-                System.out.println("old contact incoming call light: " + l);
-                if (lightName.getText().equals(l)) {
-                    lightName.setChecked(true);
-                    System.out.println("set selected: " + lightName.isChecked());
+        if (incomingDefault.equals("yes")){
+            if (controller.getDefaultIncomingLight() != null) {
+                for (String l : controller.getDefaultIncomingLight()) {
+                    if (lightName.getText().equals(l)) {
+                        lightName.setChecked(true);
+                    }
+                    lightName.setEnabled(false);
+                }
+            }
+        }
+        else {
+            if (controller.getOldContactIncomingCallLight() != null) {
+                for (String l : controller.getOldContactIncomingCallLight()) {
+                    if (lightName.getText().equals(l)) {
+                        lightName.setChecked(true);
+                    }
                 }
             }
         }

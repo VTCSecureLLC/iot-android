@@ -13,6 +13,7 @@ import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
 
+    SetupController setupController;
     ListView listContacts;
     HueController hueController;
 
@@ -24,22 +25,30 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        hueController = HueController.getInstance();
+        setupController = SetupController.getInstance();
+        if (!setupController.getSetupCompleted()){
+            //navigate to the Welcome (initial set up) page
+            startActivity(new Intent(HomeActivity.this, WelcomeActivity.class));
+        }
 
-        //connects the listview to the widgets created in xml
-        listContacts = (ListView)findViewById(R.id.listContacts);
+        else {
+            hueController = HueController.getInstance();
+
+            //connects the listview to the widgets created in xml
+            listContacts = (ListView) findViewById(R.id.listContacts);
 
 
-        //list all the stored contacts
-        stringArray = new ArrayList<>();
+            //list all the stored contacts
+            stringArray = new ArrayList<>();
 
-        if (hueController.getContactList().size() != 0){
-            for (List<String[]> contact: hueController.getContactList()){
-                stringArray.add(contact.get(0)[0] + " " + contact.get(0)[1]);
+            if (hueController.getContactList().size() != 0) {
+                for (List<String[]> contact : hueController.getContactList()) {
+                    stringArray.add(contact.get(0)[0] + " " + contact.get(0)[1]);
+                }
+
+                SimulateCallAdapter adapter = new SimulateCallAdapter(this, stringArray, hueController);
+                listContacts.setAdapter(adapter);
             }
-
-            SimulateCallAdapter adapter = new SimulateCallAdapter(this, stringArray, hueController);
-            listContacts.setAdapter(adapter);
         }
     }
 

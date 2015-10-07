@@ -1,6 +1,8 @@
 package joanbempong.android;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,15 +11,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.philips.lighting.hue.sdk.PHHueSDK;
 import com.philips.lighting.model.PHBridge;
 import com.philips.lighting.model.PHLight;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EditContactActivity extends AppCompatActivity {
@@ -33,11 +39,17 @@ public class EditContactActivity extends AppCompatActivity {
 
     private ListView incomingCallLightChoices, missedCallLightChoices;
     private Spinner incomingCallFlashPatternList, incomingCallFlashRateList, missedCallDurationList;
+    private Switch incomingSwitch, missedSwitch, notificationSwitch;
+    private ScrollView scrollView;
 
     EditText firstName, lastName, phoneNumber;
     Button saveBtn;
 
     ArrayAdapter<CharSequence> adapter;
+
+    List<String> empty = new ArrayList<>();
+
+    private String incomingDefault, missedDefault, notificationYN;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,17 +67,13 @@ public class EditContactActivity extends AppCompatActivity {
         PHBridge bridge = phHueSDK.getSelectedBridge();
         allLights = bridge.getResourceCache().getAllLights();
 
-        incomingAdapter = new IncomingCallLightChoiceAdapter(this, allLights, hueController);
-        incomingCallLightChoices = (ListView) findViewById(R.id.incomingCallListView);
-        incomingCallLightChoices.setAdapter(incomingAdapter);
-
-        missedAdapter = new MissedCallLightChoiceAdapter(this, allLights, hueController);
-        missedCallLightChoices = (ListView) findViewById(R.id.missedCallListView);
-        missedCallLightChoices.setAdapter(missedAdapter);
-
         incomingCallFlashPatternList = (Spinner)findViewById(R.id.incomingCallFlashPatternList);
         incomingCallFlashRateList = (Spinner)findViewById(R.id.incomingCallFlashRateList);
         missedCallDurationList = (Spinner)findViewById(R.id.missedCallDurationList);
+
+        incomingSwitch = (Switch)findViewById(R.id.incomingSwitch);
+        missedSwitch = (Switch)findViewById(R.id.missedSwitch);
+        notificationSwitch = (Switch)findViewById(R.id.notificationSwitch);
 
         //adds items to the spinners
         addItemsToFlashPattern();
@@ -80,11 +88,44 @@ public class EditContactActivity extends AppCompatActivity {
 
         //creates an on click listener
         saveBtn.setOnClickListener(saveBtnOnClickListener);
+        incomingSwitch.setOnCheckedChangeListener(incomingSwitchOnCheckedChangeListener);
+        missedSwitch.setOnCheckedChangeListener(missedSwitchOnCheckedChangeListener);
+        notificationSwitch.setOnCheckedChangeListener(notificationSwitchOnCheckedChangeListener);
+
+        scrollView = (ScrollView)findViewById(R.id.scrollView);
+
+        incomingDefault = hueController.getOldContactIncomingCallUseDefault()[0];
+        missedDefault = hueController.getOldContactMissedCallUseDefault()[0];
+        notificationYN = hueController.getOldContactNotificationYN()[0];
 
         //load the contact's current information
         firstName.setText(hueController.getOldContactName()[0]);
         lastName.setText(hueController.getOldContactName()[1]);
         phoneNumber.setText(hueController.getOldContactPhoneNumber()[0]);
+        if (incomingDefault.equals("yes")){
+            incomingSwitch.setChecked(true);
+        }
+        if (missedDefault.equals("yes")){
+            missedSwitch.setChecked(true);
+        }
+        if (notificationYN.equals("yes")){
+            notificationSwitch.setText("ON");
+            notificationSwitch.setChecked(true);
+            scrollView.setVisibility(View.VISIBLE);
+        }
+        else{
+            notificationSwitch.setText("OFF");
+            notificationSwitch.setChecked(false);
+            scrollView.setVisibility(View.GONE);
+        }
+
+        incomingAdapter = new IncomingCallLightChoiceAdapter(this, allLights, hueController, incomingDefault);
+        incomingCallLightChoices = (ListView) findViewById(R.id.incomingCallListView);
+        incomingCallLightChoices.setAdapter(incomingAdapter);
+
+        missedAdapter = new MissedCallLightChoiceAdapter(this, allLights, hueController, missedDefault);
+        missedCallLightChoices = (ListView) findViewById(R.id.missedCallListView);
+        missedCallLightChoices.setAdapter(missedAdapter);
     }
 
     public void addItemsToFlashPattern(){
@@ -120,36 +161,259 @@ public class EditContactActivity extends AppCompatActivity {
     View.OnClickListener saveBtnOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View arg0) {
-            if (hueController.getIncomingCallDefaultLights().size() == 0){
-                Toast.makeText(EditContactActivity.this, "Please choose a light or more for your default incoming calls.", Toast.LENGTH_SHORT).show();
-            }else if (incomingCallFlashPatternList.getSelectedItem().equals("--")){
-                Toast.makeText(EditContactActivity.this, "Please choose a flash pattern for your default incoming calls.", Toast.LENGTH_SHORT).show();
-            }else if (incomingCallFlashRateList.getSelectedItem().equals("--")){
-                Toast.makeText(EditContactActivity.this, "Please choose a flash rate for your default incoming calls.", Toast.LENGTH_SHORT).show();
-            }else if (hueController.getMissedCallDefaultLights().size() == 0){
-                Toast.makeText(EditContactActivity.this, "Please choose a light or more for your default missed calls.", Toast.LENGTH_SHORT).show();
-            }else if (missedCallDurationList.getSelectedItem().equals("--")){
-                Toast.makeText(EditContactActivity.this, "Please choose a duration for your default missed calls.", Toast.LENGTH_SHORT).show();
-            }
-            else {
-                //look for the contact and replace with new information
+            if (notificationSwitch.isChecked()) {
+                hueController.saveCurrentInformation(String.valueOf(firstName.getText()), String.valueOf(lastName.getText()));
+                if ((incomingDefault.equals("no")) && (missedDefault.equals("no"))) {
+                    if (hueController.getIncomingCallLights().size() == 0) {
+                        Toast.makeText(EditContactActivity.this, "Please choose a light or more for your incoming calls.", Toast.LENGTH_SHORT).show();
+                    } else if (incomingCallFlashPatternList.getSelectedItem().equals("--")) {
+                        Toast.makeText(EditContactActivity.this, "Please choose a flash pattern for your incoming calls.", Toast.LENGTH_SHORT).show();
+                    } else if (incomingCallFlashRateList.getSelectedItem().equals("--")) {
+                        Toast.makeText(EditContactActivity.this, "Please choose a flash rate for your incoming calls.", Toast.LENGTH_SHORT).show();
+                    } else if (hueController.getMissedCallLights().size() == 0) {
+                        Toast.makeText(EditContactActivity.this, "Please choose a light or more for your missed calls.", Toast.LENGTH_SHORT).show();
+                    } else if (missedCallDurationList.getSelectedItem().equals("--")) {
+                        Toast.makeText(EditContactActivity.this, "Please choose a duration for your missed calls.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        //look for the contact and replace with new information
+                        hueController.editContact(String.valueOf(firstName.getText()),
+                                String.valueOf(lastName.getText()), String.valueOf(phoneNumber.getText()),
+                                hueController.getIncomingCallLights(),
+                                String.valueOf(incomingCallFlashPatternList.getSelectedItem()),
+                                String.valueOf(incomingCallFlashRateList.getSelectedItem()),
+                                hueController.getMissedCallLights(),
+                                String.valueOf(missedCallDurationList.getSelectedItem()), incomingDefault, missedDefault, "yes");
+
+                        //contact has been saved -- show a toast
+                        Context context = getApplicationContext();
+                        CharSequence text = "The information for this contact has been updated.";
+                        int duration = Toast.LENGTH_SHORT;
+                        Toast toast = Toast.makeText(context, text, duration);
+                        toast.show();
+
+                        // navigate to the MyContacts page
+                        startActivity(new Intent(EditContactActivity.this, MyContactsActivity.class));
+                    }
+                } else if ((incomingDefault.equals("no")) && (missedDefault.equals("yes"))) {
+                    if (hueController.getIncomingCallLights().size() == 0) {
+                        Toast.makeText(EditContactActivity.this, "Please choose a light or more for your incoming calls.", Toast.LENGTH_SHORT).show();
+                    } else if (incomingCallFlashPatternList.getSelectedItem().equals("--")) {
+                        Toast.makeText(EditContactActivity.this, "Please choose a flash pattern for your incoming calls.", Toast.LENGTH_SHORT).show();
+                    } else if (incomingCallFlashRateList.getSelectedItem().equals("--")) {
+                        Toast.makeText(EditContactActivity.this, "Please choose a flash rate for your incoming calls.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        //look for the contact and replace with new information
+                        hueController.editContact(String.valueOf(firstName.getText()),
+                                String.valueOf(lastName.getText()), String.valueOf(phoneNumber.getText()),
+                                hueController.getIncomingCallLights(),
+                                String.valueOf(incomingCallFlashPatternList.getSelectedItem()),
+                                String.valueOf(incomingCallFlashRateList.getSelectedItem()),
+                                hueController.getDefaultMissedLight(),
+                                hueController.getDefaultMissedDuration(), incomingDefault, missedDefault, "yes");
+
+                        //contact has been saved -- show a toast
+                        Context context = getApplicationContext();
+                        CharSequence text = "The information for this contact has been updated.";
+                        int duration = Toast.LENGTH_SHORT;
+                        Toast toast = Toast.makeText(context, text, duration);
+                        toast.show();
+
+                        // navigate to the MyContacts page
+                        startActivity(new Intent(EditContactActivity.this, MyContactsActivity.class));
+                    }
+                } else if ((incomingDefault.equals("yes")) && (missedDefault.equals("no"))) {
+                    if (hueController.getMissedCallLights().size() == 0) {
+                        Toast.makeText(EditContactActivity.this, "Please choose a light or more for your missed calls.", Toast.LENGTH_SHORT).show();
+                    } else if (missedCallDurationList.getSelectedItem().equals("--")) {
+                        Toast.makeText(EditContactActivity.this, "Please choose a duration for your missed calls.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        //look for the contact and replace with new information
+                        hueController.editContact(String.valueOf(firstName.getText()),
+                                String.valueOf(lastName.getText()), String.valueOf(phoneNumber.getText()),
+                                hueController.getDefaultIncomingLight(), hueController.getDefaultIncomingFlashPattern(),
+                                hueController.getDefaultIncomingFlashRate(),
+                                hueController.getMissedCallLights(),
+                                String.valueOf(missedCallDurationList.getSelectedItem()), incomingDefault, missedDefault, "yes");
+
+                        //contact has been saved -- show a toast
+                        Context context = getApplicationContext();
+                        CharSequence text = "The information for this contact has been updated.";
+                        int duration = Toast.LENGTH_SHORT;
+                        Toast toast = Toast.makeText(context, text, duration);
+                        toast.show();
+
+                        // navigate to the MyContacts page
+                        startActivity(new Intent(EditContactActivity.this, MyContactsActivity.class));
+                    }
+                } else {
+                    hueController.editContact(String.valueOf(firstName.getText()),
+                            String.valueOf(lastName.getText()), String.valueOf(phoneNumber.getText()),
+                            hueController.getDefaultIncomingLight(), hueController.getDefaultIncomingFlashPattern(),
+                            hueController.getDefaultIncomingFlashRate(), hueController.getDefaultMissedLight(),
+                            hueController.getDefaultMissedDuration(), incomingDefault, missedDefault, "yes");
+                    //contact has been saved -- show a toast
+                    Context context = getApplicationContext();
+                    CharSequence text = "The information for this contact has been updated.";
+                    int duration = Toast.LENGTH_SHORT;
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+
+                    // navigate to the MyContacts page
+                    startActivity(new Intent(EditContactActivity.this, MyContactsActivity.class));
+                }
+            } else {
                 hueController.editContact(String.valueOf(firstName.getText()),
                         String.valueOf(lastName.getText()), String.valueOf(phoneNumber.getText()),
-                        hueController.getIncomingCallLights(),
-                        String.valueOf(incomingCallFlashPatternList.getSelectedItem()),
-                        String.valueOf(incomingCallFlashRateList.getSelectedItem()),
-                        hueController.getMissedCallLights(),
-                        String.valueOf(missedCallDurationList.getSelectedItem()));
+                        empty, "0", "0", empty, "0", "no", "no", "no");
 
                 //contact has been saved -- show a toast
                 Context context = getApplicationContext();
-                CharSequence text = "The information for this contact has been updated.";
+                CharSequence text = "The information for this contact has been saved.";
                 int duration = Toast.LENGTH_SHORT;
                 Toast toast = Toast.makeText(context, text, duration);
                 toast.show();
 
                 // navigate to the MyContacts page
                 startActivity(new Intent(EditContactActivity.this, MyContactsActivity.class));
+            }
+        }
+    };
+
+    CompoundButton.OnCheckedChangeListener incomingSwitchOnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
+            if (isChecked){
+                if (!hueController.getDefaultValues()){
+                    //creates a new alert dialog
+                    final AlertDialog.Builder alert = new AlertDialog.Builder(EditContactActivity.this);
+                    alert.setTitle("There is no default values yet");
+                    alert.setMessage("Do you want to set them now?");
+                    alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            buttonView.toggle();
+                            // navigate to the SetHueDefaultValues page
+                            startActivity(new Intent(EditContactActivity.this, SetHueDefaultValuesActivity.class));
+                        }
+                    });
+
+                    alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            buttonView.toggle();
+                        }
+                    });
+                    //create the alert dialog and show it
+                    alert.create();
+                    alert.show();
+                }
+                else {
+                    incomingDefault = "yes";
+
+                    hueController.setCleanIncomingCallLights();
+                    incomingAdapter = new IncomingCallLightChoiceAdapter(EditContactActivity.this, allLights, hueController, incomingDefault);
+                    incomingCallLightChoices = (ListView) findViewById(R.id.incomingCallListView);
+                    incomingCallLightChoices.setAdapter(incomingAdapter);
+
+                    //set the current selected item
+                    adapter = ArrayAdapter.createFromResource(EditContactActivity.this, R.array.flash_pattern_list, android.R.layout.simple_spinner_item);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    int selected = adapter.getPosition(hueController.getDefaultIncomingFlashPattern());
+                    incomingCallFlashPatternList.setSelection(selected);
+                    incomingCallFlashPatternList.setEnabled(false);
+
+
+                    adapter = ArrayAdapter.createFromResource(EditContactActivity.this, R.array.flash_rate_list, android.R.layout.simple_spinner_item);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    selected = adapter.getPosition(hueController.getDefaultIncomingFlashRate());
+                    incomingCallFlashRateList.setSelection(selected);
+                    incomingCallFlashRateList.setEnabled(false);
+                }
+            }
+            else{
+                incomingDefault = "no";
+
+                hueController.setCleanIncomingCallLights();
+                incomingAdapter = new IncomingCallLightChoiceAdapter(EditContactActivity.this, allLights, hueController, incomingDefault);
+                incomingCallLightChoices = (ListView) findViewById(R.id.incomingCallListView);
+                incomingCallLightChoices.setAdapter(incomingAdapter);
+
+                incomingCallFlashPatternList.setEnabled(true);
+                addItemsToFlashPattern();
+                incomingCallFlashRateList.setEnabled(true);
+                addItemsToFlashRate();
+            }
+        }
+    };
+
+    CompoundButton.OnCheckedChangeListener missedSwitchOnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
+            if (isChecked){
+                if (!hueController.getDefaultValues()){
+                    //creates a new alert dialog
+                    final AlertDialog.Builder alert = new AlertDialog.Builder(EditContactActivity.this);
+                    alert.setTitle("There is no default values yet");
+                    alert.setMessage("Do you want to set them now?");
+                    alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            buttonView.toggle();
+                            // navigate to the SetHueDefaultValues page
+                            startActivity(new Intent(EditContactActivity.this, SetHueDefaultValuesActivity.class));
+                        }
+                    });
+
+                    alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            buttonView.toggle();
+                        }
+                    });
+                    //create the alert dialog and show it
+                    alert.create();
+                    alert.show();
+                }
+                else {
+                    missedDefault = "yes";
+
+                    hueController.setCleanMissedCallLights();
+                    missedAdapter = new MissedCallLightChoiceAdapter(EditContactActivity.this, allLights, hueController, missedDefault);
+                    missedCallLightChoices = (ListView) findViewById(R.id.missedCallListView);
+                    missedCallLightChoices.setAdapter(missedAdapter);
+
+                    //set the current selected item
+                    adapter = ArrayAdapter.createFromResource(EditContactActivity.this, R.array.duration_list, android.R.layout.simple_spinner_item);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    int selected = adapter.getPosition(hueController.getDefaultMissedDuration());
+                    missedCallDurationList.setSelection(selected);
+                    missedCallDurationList.setEnabled(false);
+                }
+            }
+            else{
+                missedDefault = "no";
+
+                hueController.setCleanMissedCallLights();
+                missedAdapter = new MissedCallLightChoiceAdapter(EditContactActivity.this, allLights, hueController, missedDefault);
+                missedCallLightChoices = (ListView) findViewById(R.id.missedCallListView);
+                missedCallLightChoices.setAdapter(missedAdapter);
+
+                missedCallDurationList.setEnabled(true);
+                addItemsToDuration();
+            }
+        }
+    };
+
+    CompoundButton.OnCheckedChangeListener notificationSwitchOnCheckedChangeListener= new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
+            if (isChecked){
+                notificationSwitch.setText("ON");
+                scrollView.setVisibility(View.VISIBLE);
+            }
+            else{
+                notificationSwitch.setText("OFF");
+                scrollView.setVisibility(View.GONE);
             }
         }
     };

@@ -66,6 +66,16 @@ public class DefaultIncomingCallLightChoiceAdapter extends BaseAdapter {
                 }
             }
         });
+
+        if (controller.getOldDefaultIncomingLight() != null) {
+            for (String l : controller.getOldDefaultIncomingLight()){
+                System.out.println(l);
+                if (lightName.getText().equals(l)){
+                    System.out.println("set checked");
+                    lightName.setChecked(true);
+                }
+            }
+        }
         return view;
     }
 

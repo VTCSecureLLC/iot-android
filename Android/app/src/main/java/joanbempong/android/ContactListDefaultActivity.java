@@ -35,10 +35,10 @@ public class ContactListDefaultActivity extends AppCompatActivity {
 
         //"retrieve" the contact list by creating new one (for testing purpose)
         if (hueController.getContactList().size() == 0) {
-            hueController.createNewContact("Shareef", "Ali", "1111111111", empty, "0", "0", empty, "0");
-            hueController.createNewContact("Gary", "Behm", "1111111111", empty, "0", "0", empty, "0");
-            hueController.createNewContact("Joan", "Bempong", "1111111111", empty, "0", "0", empty, "0");
-            hueController.createNewContact("Brian", "Trager", "1111111111", empty, "0", "0", empty, "0");
+            hueController.createNewContact("Shareef", "Ali", "1111111111", empty, "0", "0", empty, "0", "no", "no", "no");
+            hueController.createNewContact("Gary", "Behm", "1111111111", empty, "0", "0", empty, "0", "no", "no", "no");
+            hueController.createNewContact("Joan", "Bempong", "1111111111", empty, "0", "0", empty, "0", "no", "no", "no");
+            hueController.createNewContact("Brian", "Trager", "1111111111", empty, "0", "0", empty, "0", "no", "no", "no");
         }
     }
 
@@ -54,7 +54,7 @@ public class ContactListDefaultActivity extends AppCompatActivity {
                     hueController.editContact(contact.get(0)[0], contact.get(0)[1], contact.get(1)[0],
                             hueController.getDefaultIncomingLight(), hueController.getDefaultIncomingFlashPattern(),
                             hueController.getDefaultIncomingFlashRate(), hueController.getDefaultMissedLight(),
-                            hueController.getDefaultMissedDuration());
+                            hueController.getDefaultMissedDuration(), "yes", "yes", "yes");
                 }
             }
             // navigate to the CompletedSetup page

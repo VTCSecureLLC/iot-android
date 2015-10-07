@@ -66,6 +66,15 @@ public class DefaultMissedCallLightChoiceAdapter extends BaseAdapter {
                 }
             }
         });
+
+        if (controller.getOldDefaultMissedLight() != null) {
+            for (String l : controller.getOldDefaultMissedLight()) {
+                if (lightName.getText().equals(l)) {
+                    lightName.setChecked(true);
+                    System.out.println("set selected: " + lightName.isChecked());
+                }
+            }
+        }
         return view;
     }
 

@@ -11,19 +11,20 @@ import com.philips.lighting.hue.sdk.PHHueSDK;
 import com.philips.lighting.model.PHBridge;
 import com.philips.lighting.model.PHLight;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class LightsActivity extends AppCompatActivity {
 
     ListView listLights;
-    ArrayList<String> stringArray;
     PHHueSDK phHueSDK;
+    HueController hueController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lights);
+
+        hueController = HueController.getInstance();
 
         phHueSDK = PHHueSDK.create();
         PHBridge bridge = phHueSDK.getSelectedBridge();
@@ -32,7 +33,7 @@ public class LightsActivity extends AppCompatActivity {
         //connects the listview to the widget created in xml
         listLights = (ListView)findViewById(R.id.listLights);
 
-        LightListControlAdapter adapter = new LightListControlAdapter(this, allLights);
+        LightListControlAdapter adapter = new LightListControlAdapter(this, allLights, hueController);
         listLights.setAdapter(adapter);
     }
 
@@ -40,6 +41,7 @@ public class LightsActivity extends AppCompatActivity {
     @Override
     public void onBackPressed()
     {
+        hueController.saveAllLightStates();
         //navigate to the Home page
         startActivity(new Intent(LightsActivity.this, HomeActivity.class));
     }
@@ -60,14 +62,17 @@ public class LightsActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_home) {
+            hueController.saveAllLightStates();
             //navigate to the Home page
             startActivity(new Intent(LightsActivity.this, HomeActivity.class));
         }
         else if (id == R.id.action_lights) {
+            hueController.saveAllLightStates();
             //navigate to the Lights page
             startActivity(new Intent(LightsActivity.this, LightsActivity.class));
         }
         else if (id == R.id.action_settings) {
+            hueController.saveAllLightStates();
             //navigate to the Settings page
             startActivity(new Intent(LightsActivity.this, SettingsActivity.class));
         }

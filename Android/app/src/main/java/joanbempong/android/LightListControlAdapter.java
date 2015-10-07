@@ -29,6 +29,7 @@ public class LightListControlAdapter extends BaseAdapter{
     int blue = 46920;
     int purple = 50100;
     int pink = 61100;
+    private HueController controller;
 
 
     private PHHueSDK phHueSDK = PHHueSDK.create();
@@ -40,10 +41,11 @@ public class LightListControlAdapter extends BaseAdapter{
      * @param context   the Context object.
      * @param allLights an array list of {@link PHLight} object to display.
      */
-    public LightListControlAdapter(Context context, List<PHLight> allLights) {
+    public LightListControlAdapter(Context context, List<PHLight> allLights, HueController controller) {
         // Cache the LayoutInflate to avoid asking for a new one each time.
         mInflater = LayoutInflater.from(context);
         this.allLights = allLights;
+        this.controller = controller;
     }
 
     /**
@@ -65,33 +67,13 @@ public class LightListControlAdapter extends BaseAdapter{
         final PHLight light = allLights.get(position);
         listItemText.setText(light.getName());
 
-        listItemText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                System.out.println(listItemText.getText() + " was clicked");
-                for (PHLight l : allLights) {
-                    if (l.getName().equals(listItemText.getText())) {
-                        if (l.getLastKnownLightState().isOn()) {
-                            PHLightState state = new PHLightState();
-                            state.setOn(false);
-                            bridge.updateLightState(l, state);
-                        } else {
-                            PHLightState state = new PHLightState();
-                            state.setOn(true);
-                            bridge.updateLightState(l, state);
-                        }
-                    }
-                }
-            }
-        });
-
         PHHueSDK phHueSDK;
         phHueSDK = PHHueSDK.create();
         final PHBridge bridge = phHueSDK.getSelectedBridge();
         final PHLightState state = new PHLightState();
 
         final SeekBar seekBar = (SeekBar) convertView.findViewById(R.id.seekBar);
-        int currentBright = 0;
+        int currentBright;
 
         final Button redBtn = (Button)convertView.findViewById(R.id.redBtn);
         final Button orangeBtn = (Button)convertView.findViewById(R.id.orangeBtn);
@@ -115,9 +97,7 @@ public class LightListControlAdapter extends BaseAdapter{
             @Override
             public void onClick(View v) {
                 state.setHue(red);
-                state.setOn(true);
                 bridge.updateLightState(light, state);
-
             }
         });
 
@@ -125,7 +105,6 @@ public class LightListControlAdapter extends BaseAdapter{
             @Override
             public void onClick(View v) {
                 state.setHue(orange);
-                state.setOn(true);
                 bridge.updateLightState(light, state);
             }
         });
@@ -134,7 +113,6 @@ public class LightListControlAdapter extends BaseAdapter{
             @Override
             public void onClick(View v) {
                 state.setHue(yellow);
-                state.setOn(true);
                 bridge.updateLightState(light, state);
             }
         });
@@ -143,7 +121,6 @@ public class LightListControlAdapter extends BaseAdapter{
             @Override
             public void onClick(View v) {
                 state.setHue(green);
-                state.setOn(true);
                 bridge.updateLightState(light, state);
             }
         });
@@ -152,7 +129,6 @@ public class LightListControlAdapter extends BaseAdapter{
             @Override
             public void onClick(View v) {
                 state.setHue(blue);
-                state.setOn(true);
                 bridge.updateLightState(light, state);
 
             }
@@ -162,7 +138,6 @@ public class LightListControlAdapter extends BaseAdapter{
             @Override
             public void onClick(View v) {
                 state.setHue(purple);
-                state.setOn(true);
                 bridge.updateLightState(light, state);
             }
         });
@@ -171,7 +146,6 @@ public class LightListControlAdapter extends BaseAdapter{
             @Override
             public void onClick(View v) {
                 state.setHue(pink);
-                state.setOn(true);
                 bridge.updateLightState(light, state);
             }
         });
@@ -181,7 +155,6 @@ public class LightListControlAdapter extends BaseAdapter{
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 int lightBright = seekBar.getProgress();
                 state.setBrightness(lightBright);
-                state.setOn(true);
                 bridge.updateLightState(light, state);
             }
 
@@ -189,7 +162,6 @@ public class LightListControlAdapter extends BaseAdapter{
             public void onStartTrackingTouch(SeekBar seekBar) {
                 int lightBright = seekBar.getProgress();
                 state.setBrightness(lightBright);
-                state.setOn(true);
                 bridge.updateLightState(light, state);
             }
 
@@ -197,18 +169,45 @@ public class LightListControlAdapter extends BaseAdapter{
             public void onStopTrackingTouch(SeekBar seekBar) {
                 int lightBright = seekBar.getProgress();
                 state.setBrightness(lightBright);
-                state.setOn(true);
                 bridge.updateLightState(light, state);
             }
         });
 
+        controller.restoreAllLightStates();
+
         for (PHLight l : allLights){
             if (listItemText.getText().equals(l.getName())){
                 currentBright = l.getLastKnownLightState().getBrightness();
+                seekBar.setProgress(currentBright);
+                if (!l.getLastKnownLightState().isOn()){
+                    seekBar.setEnabled(false);
+                }
                 break;
             }
         }
-        seekBar.setProgress(currentBright);
+
+        listItemText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println(listItemText.getText() + " was clicked");
+                for (PHLight l : allLights) {
+                    if (l.getName().equals(listItemText.getText())) {
+                        if (l.getLastKnownLightState().isOn()) {
+                            PHLightState state = new PHLightState();
+                            state.setOn(false);
+                            bridge.updateLightState(l, state);
+                            seekBar.setEnabled(false);
+                        } else {
+                            PHLightState state = new PHLightState();
+                            state.setOn(true);
+                            state.setBrightness(l.getLastKnownLightState().getBrightness());
+                            bridge.updateLightState(l, state);
+                            seekBar.setEnabled(true);
+                        }
+                    }
+                }
+            }
+        });
 
         return convertView;
     }
