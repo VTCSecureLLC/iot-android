@@ -9,7 +9,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -42,8 +41,8 @@ public class HomeActivity extends AppCompatActivity {
             stringArray = new ArrayList<>();
 
             if (hueController.getContactList().size() != 0) {
-                for (List<String[]> contact : hueController.getContactList()) {
-                    stringArray.add(contact.get(0)[0] + " " + contact.get(0)[1]);
+                for (ACEContact contact : hueController.getContactList()) {
+                    stringArray.add(contact.getFirstName() + " " + contact.getLastName());
                 }
 
                 SimulateCallAdapter adapter = new SimulateCallAdapter(this, stringArray, hueController);

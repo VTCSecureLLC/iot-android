@@ -25,6 +25,7 @@ public class LightsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_lights);
 
         hueController = HueController.getInstance();
+        hueController.restoreAllLightStates();
 
         phHueSDK = PHHueSDK.create();
         PHBridge bridge = phHueSDK.getSelectedBridge();

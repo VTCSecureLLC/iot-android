@@ -17,7 +17,6 @@ import java.util.List;
 
 public class MoreLightsActivity extends Activity {
     private PHHueSDK phHueSDK;
-    public static final String TAG = "ACE Notification";
 
     private LightListAdapter adapter;
 
@@ -27,8 +26,6 @@ public class MoreLightsActivity extends Activity {
         setContentView(R.layout.activity_more_lights);
 
         phHueSDK = PHHueSDK.getInstance();
-
-        phHueSDK.setDeviceName("ACTNotification");
 
         Button yesBtn, noBtn;
 

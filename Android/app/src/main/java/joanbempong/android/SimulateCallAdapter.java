@@ -1,5 +1,6 @@
 package joanbempong.android;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -75,6 +76,7 @@ public class SimulateCallAdapter extends BaseAdapter {
         ImageButton simulateBtn = (ImageButton) view.findViewById(R.id.simulate_btn);
 
         simulateBtn.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("NewApi")
             @Override
             public void onClick(View v) {
                 controller.saveAllLightStates();
@@ -101,25 +103,27 @@ public class SimulateCallAdapter extends BaseAdapter {
                         controller.setCallAnswered(true);
                     }
                 });
+                alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        controller.setCallAnswered(true);
+                    }
+                });
                 //create the alert dialog and show it
 
                 alert.create();
                 //alert.show();
                 final AlertDialog dialog = alert.show();
 
-                //call the simulate function in ACE Controller
-                //controller.simulateAnIncomingCall(listItemText.getText());
-
-
                 //replaces controller.simulateAnIncomingCall()
                 String[] nameSplit = listItemText.getText().toString().split("\\s+");
 
                 if (controller.getContactList().size() != 0) {
-                    for (final List<String[]> contact : controller.getContactList()) {
-                        if (nameSplit[0].equals(contact.get(0)[0]) && nameSplit[1].equals(contact.get(0)[1])) {
-                            String notif = contact.get(8)[0];
-                            if (notif.equals("yes")) {
-                                double flashRate = Double.parseDouble(contact.get(3)[1]);
+                    for (final ACEContact contact : controller.getContactList()) {
+                        if (nameSplit[0].equals(contact.getFirstName()) && nameSplit[1].equals(contact.getLastName())) {
+                            final int val = controller.getHueValue(contact.getColor());
+                            if (contact.getUseNotification()) {
+                                double flashRate = Double.parseDouble(contact.getFlashRate());
                                 MAX_TOTAL_RINGS = (int) ((10 / flashRate) * 2);
                                 LONG_PERIOD = (int) (flashRate * 1000);
 
@@ -129,19 +133,21 @@ public class SimulateCallAdapter extends BaseAdapter {
                                         timer.schedule(new TimerTask() {
                                             @Override
                                             public void run() {
+                                                outerLoop:
                                                 for (final PHLight light : allLights) {
-                                                    for (String lightName : contact.get(2)) {
+                                                    for (String lightName : controller.getDefaultLights()) {
                                                         if (lightName.equals(light.getName())) {
                                                             System.out.println("ticking");
                                                             System.out.println(totalRings);
                                                             if (totalRings == MAX_TOTAL_RINGS) { //lasts for 20 seconds
                                                                 if (!controller.getCallAnswered()) {
-                                                                    controller.simulateAMissedCall(contact.get(4), contact.get(5)[0]);
+                                                                    controller.simulateAMissedCall();
                                                                     dialog.cancel();
                                                                 }
+                                                                System.out.println(lightName);
                                                                 System.out.println("timer cancelled");
                                                                 cancel();
-                                                                break;
+                                                                break outerLoop;
                                                             }
                                                             if (!controller.getCallAnswered()) {
                                                                 PHLightState state = new PHLightState();
@@ -149,12 +155,13 @@ public class SimulateCallAdapter extends BaseAdapter {
                                                                 bridge.updateLightState(light, state);
                                                                 state.setBrightness(255);
                                                                 bridge.updateLightState(light, state);
+                                                                if (light.supportsColor()){
+                                                                    state.setHue(val);
+                                                                    bridge.updateLightState(light, state);
+                                                                }
                                                                 System.out.println(light.getName() + " is " + controller.getToggle());
 
                                                             } else {
-                                                            /*PHLightState state = new PHLightState();
-                                                            state.setOn(false);
-                                                            bridge.updateLightState(light, state);*/
                                                                 System.out.println("call answered/declined -- timer cancelled");
                                                                 cancel();
                                                             }

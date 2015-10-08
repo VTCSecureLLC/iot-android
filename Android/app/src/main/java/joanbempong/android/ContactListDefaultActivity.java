@@ -1,22 +1,19 @@
 package joanbempong.android;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 public class ContactListDefaultActivity extends AppCompatActivity {
 
     Button yesBtn, noBtn;
     HueController hueController;
-    List<String> empty = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,36 +22,27 @@ public class ContactListDefaultActivity extends AppCompatActivity {
 
         hueController = HueController.getInstance();
 
-        //connects the textviews and buttons to the widgets created in xml
+        //connects the textViews and buttons to the widgets created in xml
         yesBtn = (Button)findViewById(R.id.yesBtn);
         noBtn = (Button)findViewById(R.id.noBtn);
 
         //creates on click listeners
         yesBtn.setOnClickListener(yesBtnOnClickListener);
         noBtn.setOnClickListener(noBtnOnClickListener);
-
-        //"retrieve" the contact list by creating new one (for testing purpose)
-        if (hueController.getContactList().size() == 0) {
-            hueController.createNewContact("Shareef", "Ali", "1111111111", empty, "0", "0", empty, "0", "no", "no", "no");
-            hueController.createNewContact("Gary", "Behm", "1111111111", empty, "0", "0", empty, "0", "no", "no", "no");
-            hueController.createNewContact("Joan", "Bempong", "1111111111", empty, "0", "0", empty, "0", "no", "no", "no");
-            hueController.createNewContact("Brian", "Trager", "1111111111", empty, "0", "0", empty, "0", "no", "no", "no");
-        }
     }
-
 
     View.OnClickListener yesBtnOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View arg0) {
             //assign the default values to all of the contacts' notification settings
             if (hueController.getContactList() != null){
-                for (Iterator<List<String[]>> iterate = hueController.getContactList().listIterator(); iterate.hasNext();){
-                    List<String[]> contact = iterate.next();
-                    hueController.saveCurrentInformation(contact.get(0)[0], contact.get(0)[1]);
-                    hueController.editContact(contact.get(0)[0], contact.get(0)[1], contact.get(1)[0],
-                            hueController.getDefaultIncomingLight(), hueController.getDefaultIncomingFlashPattern(),
-                            hueController.getDefaultIncomingFlashRate(), hueController.getDefaultMissedLight(),
-                            hueController.getDefaultMissedDuration(), "yes", "yes", "yes");
+                for (Iterator<ACEContact> iterate = hueController.getContactList().listIterator(); iterate.hasNext();){
+                    ACEContact contact = iterate.next();
+                    hueController.saveCurrentInformation(contact.getFirstName(), contact.getLastName());
+                    hueController.editContact(contact.getFirstName(), contact.getLastName(), contact.getPhoneNumber(),
+                            hueController.getDefaultFlashPattern(), hueController.getDefaultFlashRate(),
+                            hueController.getDefaultColor(), true,
+                            true);
                 }
             }
             // navigate to the CompletedSetup page

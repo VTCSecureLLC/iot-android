@@ -1,5 +1,6 @@
 package joanbempong.android;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,6 +21,7 @@ import com.philips.lighting.model.PHBridgeResource;
 import com.philips.lighting.model.PHHueError;
 import com.philips.lighting.model.PHLight;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +34,7 @@ public class EditLightAdapter extends BaseAdapter {
     private List<PHLight> allLights;
     private Context context;
     private long sleep = 500;
+    private HueController controller = HueController.getInstance();
 
     /**
      * creates instance of {@link LightListAdapter} class.
@@ -70,6 +73,7 @@ public class EditLightAdapter extends BaseAdapter {
 
             @Override
             public void onClick(View v) {
+                System.out.println(lightName.getText() + " is listening......");
                 //creates a new alert dialog
                 final AlertDialog.Builder alert = new AlertDialog.Builder(context);
                 final EditText rename = new EditText(context);
@@ -80,12 +84,20 @@ public class EditLightAdapter extends BaseAdapter {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         renameLight(light, rename);
+                        controller.stopFlashing();
 
+                    }
+                });
+                alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        controller.stopFlashing();
                     }
                 });
                 //create the alert dialog and show it
                 alert.create();
                 alert.show();
+                controller.startFlashing(light);
             }
 
         });
@@ -97,6 +109,7 @@ public class EditLightAdapter extends BaseAdapter {
                 Handler mainHandler = new Handler(context.getMainLooper());
                 Runnable deleteRunner = new Runnable() {
 
+                    @SuppressLint("NewApi")
                     @Override
                     public void run() {
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -105,6 +118,7 @@ public class EditLightAdapter extends BaseAdapter {
                         builder.setPositiveButton(R.string.btn_yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                controller.stopFlashing();
                                 deleteOnClick(light);
                                 try {
                                     TimeUnit.MILLISECONDS.sleep(sleep);
@@ -115,15 +129,23 @@ public class EditLightAdapter extends BaseAdapter {
                                 context.startActivity(new Intent(context, MyLightsActivity.class));
                             }
                         });
+                        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                controller.stopFlashing();
+                            }
+                        });
                         builder.setNegativeButton(R.string.btn_no, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                controller.stopFlashing();
                                 dialog.cancel();
                             }
                         });
 
                         builder.create();
                         builder.show();
+                        controller.startFlashing(light);
                     }
                 };
                 mainHandler.post(deleteRunner);
@@ -134,6 +156,15 @@ public class EditLightAdapter extends BaseAdapter {
     }
 
     public void deleteOnClick(PHLight light) {
+        //update the selected default lights
+        for (Iterator<String> iter = controller.getDefaultLights().listIterator(); iter.hasNext();){
+            String currentLight = iter.next();
+            if (currentLight.equals(light.getName())){
+                iter.remove();
+                System.out.println(currentLight + " removed successfully from preferred default lights");
+            }
+        }
+
         // If you want to handle the response from the bridge, create a PHLightListener object.
         PHLightListener listener = new PHLightListener() {
 
@@ -159,6 +190,8 @@ public class EditLightAdapter extends BaseAdapter {
         PHHueSDK phHueSDK = PHHueSDK.create();
         PHBridge bridge = phHueSDK.getSelectedBridge();
         bridge.deleteLight(light.getIdentifier(), listener);
+
+
     }
 
     public void renameLight(final PHLight light, EditText newName) {

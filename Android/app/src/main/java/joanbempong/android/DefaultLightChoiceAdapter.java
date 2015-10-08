@@ -13,14 +13,13 @@ import com.philips.lighting.model.PHLight;
 import java.util.List;
 
 /**
- * Created by Joan Bempong on 10/1/2015.
+ * Created by Joan Bempong on 10/8/2015.
  */
-public class IncomingCallLightChoiceAdapter extends BaseAdapter {
+public class DefaultLightChoiceAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     private List<PHLight> myChoices;
     private Context context;
     private HueController controller;
-    private String incomingDefault;
 
     /**
      * creates instance of {@link LightListAdapter} class.
@@ -28,14 +27,12 @@ public class IncomingCallLightChoiceAdapter extends BaseAdapter {
      * @param context   the Context object.
      * @param allLights an array list of {@link PHLight} object to display.
      */
-    public IncomingCallLightChoiceAdapter(Context context, List<PHLight> allLights, HueController controller,
-                                          String incomingDefault) {
+    public DefaultLightChoiceAdapter(Context context, List<PHLight> allLights, HueController controller) {
         this.context = context;
         // Cache the LayoutInflate to avoid asking for a new one each time.
         mInflater = LayoutInflater.from(context);
         this.myChoices = allLights;
         this.controller = controller;
-        this.incomingDefault = incomingDefault;
     }
 
     /**
@@ -62,30 +59,20 @@ public class IncomingCallLightChoiceAdapter extends BaseAdapter {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked){
-                    controller.addToIncomingCallLightsList(light.getName());
+                    controller.addToDefaultLights(light.getName());
                 }
                 else{
-                    controller.removeFromIncomingCallLightsList(light.getName());
+                    controller.removeFromDefaultLights(light.getName());
                 }
             }
         });
 
-        if (incomingDefault.equals("yes")){
-            if (controller.getDefaultIncomingLight() != null) {
-                for (String l : controller.getDefaultIncomingLight()) {
-                    if (lightName.getText().equals(l)) {
-                        lightName.setChecked(true);
-                    }
-                    lightName.setEnabled(false);
-                }
-            }
-        }
-        else {
-            if (controller.getOldContactIncomingCallLight() != null) {
-                for (String l : controller.getOldContactIncomingCallLight()) {
-                    if (lightName.getText().equals(l)) {
-                        lightName.setChecked(true);
-                    }
+        if (controller.getOldDefaultLights() != null) {
+            for (String l : controller.getOldDefaultLights()){
+                System.out.println(l);
+                if (lightName.getText().equals(l)){
+                    System.out.println("set checked");
+                    lightName.setChecked(true);
                 }
             }
         }

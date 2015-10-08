@@ -13,7 +13,6 @@ import com.philips.lighting.model.PHLight;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Created by Joan Bempong on 10/1/2015.
@@ -69,9 +68,9 @@ public class ContactListSettingsAdapter extends BaseAdapter {
                 //go through the Contacts list and delete this contact
                 if (controller.getContactList().size() != 0){
                     System.out.println("in loop");
-                    for (Iterator<List<String[]>> iter = controller.getContactList().listIterator(); iter.hasNext();){
-                        List<String[]> contact = iter.next();
-                        if (nameSplit[0].equals(contact.get(0)[0]) && nameSplit[1].equals(contact.get(0)[1])) {
+                    for (Iterator<ACEContact> iter = controller.getContactList().listIterator(); iter.hasNext();){
+                        ACEContact contact = iter.next();
+                        if (nameSplit[0].equals(contact.getFirstName()) && nameSplit[1].equals(contact.getLastName())) {
                             iter.remove();
                             System.out.println("removed successfully");
                         }

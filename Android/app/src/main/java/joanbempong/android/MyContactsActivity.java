@@ -1,8 +1,8 @@
 package joanbempong.android;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MyContactsActivity extends AppCompatActivity {
 
@@ -40,8 +39,8 @@ public class MyContactsActivity extends AppCompatActivity {
         stringArray = new ArrayList<>();
 
         if (hueController.getContactList().size() != 0){
-            for (List<String[]> contact: hueController.getContactList()){
-                stringArray.add(contact.get(0)[0] + " " + contact.get(0)[1]);
+            for (ACEContact contact: hueController.getContactList()){
+                stringArray.add(contact.getFirstName() + " " + contact.getLastName());
             }
 
             ContactListSettingsAdapter adapter = new ContactListSettingsAdapter(this, stringArray, hueController);

@@ -16,24 +16,23 @@ import com.philips.lighting.hue.sdk.PHHueSDK;
 import com.philips.lighting.model.PHBridge;
 import com.philips.lighting.model.PHLight;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HueDefaultValuesActivity extends Activity {
 
     private PHHueSDK phHueSDK;
     private HueController hueController;
-
-
+    private MyChoices myChoices;
     private List<PHLight> allLights;
 
-    private DefaultIncomingCallLightChoiceAdapter incomingAdapter;
-    private DefaultMissedCallLightChoiceAdapter missedAdapter;
+    private DefaultLightChoiceAdapter defaultAdapter;
 
-    private ListView incomingCallLightChoices, missedCallLightChoices;
-    private Spinner incomingCallFlashPatternList, incomingCallFlashRateList, missedCallDurationList;
+    private ListView lightChoices;
+    private Spinner durationList, flashPatternList, flashRateList, colorList;
 
-    Button nextBtn, skipBtn;
-    ArrayAdapter<CharSequence> adapter;
+    private Button nextBtn, skipBtn;
+    private ArrayAdapter<String> adapterFP, adapterFR, adapterC;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,26 +41,25 @@ public class HueDefaultValuesActivity extends Activity {
 
         phHueSDK = PHHueSDK.getInstance();
         hueController = HueController.getInstance();
+        myChoices = MyChoices.getInstance();
 
         PHBridge bridge = phHueSDK.getSelectedBridge();
         allLights = bridge.getResourceCache().getAllLights();
 
-        incomingAdapter = new DefaultIncomingCallLightChoiceAdapter(this, allLights, hueController);
-        incomingCallLightChoices = (ListView) findViewById(R.id.incomingCallListView);
-        incomingCallLightChoices.setAdapter(incomingAdapter);
+        defaultAdapter = new DefaultLightChoiceAdapter(this, allLights, hueController);
+        lightChoices = (ListView) findViewById(R.id.defaultListView);
+        lightChoices.setAdapter(defaultAdapter);
 
-        missedAdapter = new DefaultMissedCallLightChoiceAdapter(this, allLights, hueController);
-        missedCallLightChoices = (ListView) findViewById(R.id.missedCallListView);
-        missedCallLightChoices.setAdapter(missedAdapter);
-
-        incomingCallFlashPatternList = (Spinner)findViewById(R.id.incomingCallFlashPatternList);
-        incomingCallFlashRateList = (Spinner)findViewById(R.id.incomingCallFlashRateList);
-        missedCallDurationList = (Spinner)findViewById(R.id.missedCallDurationList);
+        durationList = (Spinner)findViewById(R.id.durationList);
+        flashPatternList = (Spinner)findViewById(R.id.flashPatternList);
+        flashRateList = (Spinner)findViewById(R.id.flashRateList);
+        colorList = (Spinner)findViewById(R.id.colorList);
 
         //adds items to the spinners
-        addItemsToFlashPattern();
-        addItemsToFlashRate();
-        addItemsToDuration();
+        addItemsToDurationList();
+        addItemsToFlashPatternList();
+        addItemsToFlashRateList();
+        addItemsToColorList();
 
         //connects the button to the widgets created in xml
         nextBtn = (Button)findViewById(R.id.nextBtn);
@@ -73,43 +71,57 @@ public class HueDefaultValuesActivity extends Activity {
 
     }
 
-    public void addItemsToFlashPattern(){
-        adapter = ArrayAdapter.createFromResource(this, R.array.flash_pattern_list, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        incomingCallFlashPatternList.setAdapter(adapter);
+    public void addItemsToDurationList(){
+        ArrayList<String> choices = myChoices.getDurationList();
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, choices);
+        durationList.setAdapter(adapter);
     }
 
-    public void addItemsToFlashRate(){
-        adapter = ArrayAdapter.createFromResource(this, R.array.flash_rate_list, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        incomingCallFlashRateList.setAdapter(adapter);
+    public void addItemsToFlashPatternList(){
+        ArrayList<String> choices = myChoices.getFlashPatternList();
+        adapterFP = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, choices);
+        flashPatternList.setAdapter(adapterFP);
     }
 
-    public void addItemsToDuration(){
-        adapter = ArrayAdapter.createFromResource(this, R.array.duration_list, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        missedCallDurationList.setAdapter(adapter);
+    public void addItemsToFlashRateList(){
+        ArrayList<String> choices = myChoices.getFlashRateList();
+        adapterFR = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, choices);
+        flashRateList.setAdapter(adapterFR);
     }
+
+    public void addItemsToColorList(){
+        ArrayList<String> choices = myChoices.getColorList();
+        adapterC = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, choices);
+        colorList.setAdapter(adapterC);
+    }
+
 
     View.OnClickListener nextBtnOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View arg0) {
-            if (hueController.getIncomingCallDefaultLights().size() == 0){
-                Toast.makeText(HueDefaultValuesActivity.this, "Please choose a light or more for your default incoming calls.", Toast.LENGTH_SHORT).show();
-            }else if (incomingCallFlashPatternList.getSelectedItem().equals("--")){
-                Toast.makeText(HueDefaultValuesActivity.this, "Please choose a flash pattern for your default incoming calls.", Toast.LENGTH_SHORT).show();
-            }else if (incomingCallFlashRateList.getSelectedItem().equals("--")){
-                Toast.makeText(HueDefaultValuesActivity.this, "Please choose a flash rate for your default incoming calls.", Toast.LENGTH_SHORT).show();
-            }else if (hueController.getMissedCallDefaultLights().size() == 0){
-                Toast.makeText(HueDefaultValuesActivity.this, "Please choose a light or more for your default missed calls.", Toast.LENGTH_SHORT).show();
-            }else if (missedCallDurationList.getSelectedItem().equals("--")){
+            if (hueController.getDefaultLights().size() == 0){
+                Toast.makeText(HueDefaultValuesActivity.this, "Please choose a light or more for your default incoming/missed calls.", Toast.LENGTH_SHORT).show();
+            }else if (durationList.getSelectedItem().equals("--")){
                 Toast.makeText(HueDefaultValuesActivity.this, "Please choose a duration for your default missed calls.", Toast.LENGTH_SHORT).show();
+            }else if (flashPatternList.getSelectedItem().equals("--")){
+                Toast.makeText(HueDefaultValuesActivity.this, "Please choose a flash pattern for your default incoming calls.", Toast.LENGTH_SHORT).show();
+            }else if (flashRateList.getSelectedItem().equals("--")){
+                Toast.makeText(HueDefaultValuesActivity.this, "Please choose a flash rate for your default incoming calls.", Toast.LENGTH_SHORT).show();
+            }else if (colorList.getSelectedItem().equals("--")){
+                Toast.makeText(HueDefaultValuesActivity.this, "Please choose a color for your default incoming/missed calls.", Toast.LENGTH_SHORT).show();
             }
             else{
-                hueController.saveDefaultValues(String.valueOf(incomingCallFlashPatternList.getSelectedItem()),
-                        String.valueOf(incomingCallFlashRateList.getSelectedItem()), String.valueOf(missedCallDurationList.getSelectedItem()));
-                Toast.makeText(HueDefaultValuesActivity.this, "The default values have been saved", Toast.LENGTH_SHORT).show();
+                hueController.saveDefaultValues(String.valueOf(durationList.getSelectedItem()),
+                        String.valueOf(flashPatternList.getSelectedItem()), String.valueOf(flashRateList.getSelectedItem()),
+                        String.valueOf(colorList.getSelectedItem()));
                 hueController.setDefaultValues(true);
+                //"retrieve" the contact list by creating new one (for testing purpose)
+                if (hueController.getContactList().size() == 0) {
+                    hueController.createNewContact("Shareef", "Ali", "1111111111", "0", "0", "0", false, false);
+                    hueController.createNewContact("Gary", "Behm", "1111111111", "0", "0", "0", false, false);
+                    hueController.createNewContact("Joan", "Bempong", "1111111111", "0", "0", "0", false, false);
+                    hueController.createNewContact("Brian", "Trager", "1111111111", "0", "0", "0", false, false);
+                }
                 // navigate to the ContactListDefaultActivity page
                 startActivity(new Intent(HueDefaultValuesActivity.this, ContactListDefaultActivity.class));
             }
@@ -119,6 +131,13 @@ public class HueDefaultValuesActivity extends Activity {
     View.OnClickListener skipBtnOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View arg0) {
+            //"retrieve" the contact list by creating new one (for testing purpose)
+            if (hueController.getContactList().size() == 0) {
+                hueController.createNewContact("Shareef", "Ali", "1111111111", "0", "0", "0", false, false);
+                hueController.createNewContact("Gary", "Behm", "1111111111", "0", "0", "0", false, false);
+                hueController.createNewContact("Joan", "Bempong", "1111111111", "0", "0", "0", false, false);
+                hueController.createNewContact("Brian", "Trager", "1111111111", "0", "0", "0", false, false);
+            }
             // navigate to the CompletedSetupActivity page
             startActivity(new Intent(HueDefaultValuesActivity.this, CompletedSetupActivity.class));
         }

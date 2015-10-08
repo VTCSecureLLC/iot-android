@@ -173,8 +173,6 @@ public class LightListControlAdapter extends BaseAdapter{
             }
         });
 
-        controller.restoreAllLightStates();
-
         for (PHLight l : allLights){
             if (listItemText.getText().equals(l.getName())){
                 currentBright = l.getLastKnownLightState().getBrightness();

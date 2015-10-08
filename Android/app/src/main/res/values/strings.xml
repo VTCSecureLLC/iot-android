@@ -49,13 +49,28 @@
     <string name="add_light_instruction">Make sure the new lights are on and tap search.</string>
     <string name="btn_search">Search</string>
     <string name="title_activity_hue_default_values">Setting Default Values</string>
-    <string name="default_values">The next step is to set the default values for your Hue system.</string>
+    <string name="default_values">
+    The next step is to set the default values for your Hue system.</string>
+    <string name="default_values_more">The chosen light(s) and duration will be fixed for all calls. However, the flash
+        pattern, flash rate, and color can be customized for each contact.</string>
     <string name="incoming_call">Incoming Call</string>
     <string name="missed_call">Missed Call</string>
     <string name="light_choice">Light(s)</string>
-    <string name="flash_pattern">Flash Pattern</string>
-    <string name="flash_rate">Flash Rate (in seconds)</string>
-    <string name="duration">Duration (in minutes)</string>
+    <string name="duration">Duration for Missed Calls (in minutes)</string>
+    <string name="flash_pattern">Flash Pattern for Incoming Calls</string>
+    <string name="flash_rate">Flash Rate for Incoming Calls (in seconds)</string>
+    <string name="color">Color</string>
+    <string-array name="duration_list">
+        <item>--</item>
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>30</item>
+        <item>45</item>
+        <item>60</item>
+        <item>Always On</item>
+    </string-array>
     <string-array name="flash_pattern_list">
         <item>--</item>
         <item>Slow</item>
@@ -69,16 +84,16 @@
         <item>1.5</item>
         <item>2</item>
     </string-array>
-    <string-array name="duration_list">
+    <string-array name="color_list">
         <item>--</item>
-        <item>1</item>
-        <item>5</item>
-        <item>10</item>
-        <item>15</item>
-        <item>30</item>
-        <item>45</item>
-        <item>60</item>
-        <item>Always On</item>
+        <item>warm white</item>
+        <item>red</item>
+        <item>orange</item>
+        <item>yellow</item>
+        <item>green</item>
+        <item>blue</item>
+        <item>purple</item>
+        <item>pink</item>
     </string-array>
     <string name="title_activity_contact_list_default">Assigning Default Values</string>
     <string name="contact_default">"Your current contact list has been retrieved. Do you want those people to be assigned the default values?"</string>

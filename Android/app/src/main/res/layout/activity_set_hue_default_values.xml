@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="@string/set_default_values"
-                android:id="@+id/defaultVal"
+                android:id="@+id/defaultValues"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true" />
@@ -43,10 +43,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="@string/incoming_call"
-                android:id="@+id/incomingCallText"
-                android:layout_below="@+id/defaultVal"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@string/default_values_more"
+                android:id="@+id/defaultValuesMore"
+                android:layout_below="@+id/defaultValues"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true" />
 
@@ -55,16 +55,16 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/light_choice"
-                android:id="@+id/incomingCallLight"
-                android:layout_below="@+id/incomingCallText"
+                android:id="@+id/defaultLight"
+                android:layout_below="@+id/defaultValuesMore"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true" />
 
             <ListView
                 android:layout_width="wrap_content"
                 android:layout_height="180dp"
-                android:id="@+id/incomingCallListView"
-                android:layout_below="@+id/incomingCallLight"
+                android:id="@+id/defaultListView"
+                android:layout_below="@+id/defaultLight"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:choiceMode="singleChoice" />
@@ -73,17 +73,35 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/flash_pattern"
-                android:id="@+id/incomingCallFlashPattern"
-                android:layout_below="@+id/incomingCallListView"
+                android:text="@string/duration"
+                android:id="@+id/duration"
+                android:layout_below="@+id/defaultListView"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true" />
 
             <Spinner
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/incomingCallFlashPatternList"
-                android:layout_below="@+id/incomingCallFlashPattern"
+                android:id="@+id/durationList"
+                android:layout_below="@+id/duration"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/flash_pattern"
+                android:id="@+id/flashPattern"
+                android:layout_below="@+id/durationList"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <Spinner
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/flashPatternList"
+                android:layout_below="@+id/flashPattern"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true" />
 
@@ -92,26 +110,16 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/flash_rate"
-                android:id="@+id/incomingCallFlashRate"
-                android:layout_below="@+id/incomingCallFlashPatternList"
+                android:id="@+id/flashRate"
+                android:layout_below="@+id/flashPatternList"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true" />
 
             <Spinner
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/incomingCallFlashRateList"
-                android:layout_below="@+id/incomingCallFlashRate"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="@string/missed_call"
-                android:id="@+id/missedCallText"
-                android:layout_below="@+id/incomingCallFlashRateList"
+                android:id="@+id/flashRateList"
+                android:layout_below="@+id/flashRate"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true" />
 
@@ -119,35 +127,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/light_choice"
-                android:id="@+id/missedCallLight"
-                android:layout_below="@+id/missedCallText"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-
-            <ListView
-                android:layout_width="wrap_content"
-                android:layout_height="180dp"
-                android:id="@+id/missedCallListView"
-                android:layout_below="@+id/missedCallLight"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/duration"
-                android:id="@+id/missedCallDuration"
-                android:layout_below="@+id/missedCallListView"
+                android:text="@string/color"
+                android:id="@+id/color"
+                android:layout_below="@+id/flashRateList"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true" />
 
             <Spinner
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/missedCallDurationList"
-                android:layout_below="@+id/missedCallDuration"
+                android:id="@+id/colorList"
+                android:layout_below="@+id/color"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true" />
 
