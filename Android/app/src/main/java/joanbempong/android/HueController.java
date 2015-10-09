@@ -50,9 +50,12 @@ public class HueController {
 
     private boolean toggle = false;
     private int totalDuration = 0;
+    private int totalCommands = 0;
     private boolean callAnswered = false;
     private boolean defaultValues = false;
     private boolean isFlashing = false;
+    private boolean newMissedCall = false;
+    private boolean exitingMissedCall = false;
 
 
 
@@ -183,7 +186,6 @@ public class HueController {
         defaultLights = new ArrayList<>();
     }
 
-
    //save current default values
     public void saveCurrentDefaultValues(){
         oldDefaultLights = defaultLights;
@@ -191,6 +193,14 @@ public class HueController {
         oldDefaultFlashPattern = defaultFlashPattern;
         oldDefaultFlashRate = defaultFlashRate;
         oldDefaultColor = defaultColor;
+    }
+
+    public void setNewMissedCall(Boolean b){
+        this.newMissedCall = b;
+    }
+
+    public void setTotalCommands(int i){
+        this.totalCommands = i;
     }
 
     public void createNewContact(String firstName, String lastName, String phoneNumber,
@@ -246,34 +256,26 @@ public class HueController {
     }
 
     public void simulateAMissedCall() {
+        totalCommands = 0;
         PHHueSDK phHueSDK;
-        phHueSDK = PHHueSDK.create();
+        phHueSDK = PHHueSDK.getInstance();
         totalDuration = 0;
         final PHBridge bridge = phHueSDK.getSelectedBridge();
         final List<PHLight> allLights = bridge.getResourceCache().getAllLights();
 
-        for (final PHLight light : allLights) {
-            PHLightState state = new PHLightState();
-            state.setOn(false);
-            bridge.updateLightState(light, state);
-        }
-
-        //wait for a bit before executing the next part of the code
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         if (!getDefaultDuration().equals("Always On (energy saving)")){
-            for (final PHLight light : allLights) {
-                for (String lightName : getDefaultLights()) {
+            for (String lightName : getDefaultLights()) {
+                innerLoop:
+                for (final PHLight light : allLights) {
                     if (lightName.equals(light.getName())) {
                         PHLightState newState = new PHLightState();
                         newState.setOn(true);
                         bridge.updateLightState(light, newState);
+                        incrementAndCheck10();
                         newState.setBrightness(255);
                         bridge.updateLightState(light, newState);
+                        incrementAndCheck10();
+                        break innerLoop;
                     }
                 }
             }
@@ -283,18 +285,26 @@ public class HueController {
                 (new Thread() {
                     public void run() {
                         Timer timer = new Timer();
+                        System.out.println("timer has been created for missed calls");
                         timer.schedule(new TimerTask() {
                             @Override
                             public void run() {
-                                System.out.println("ticking");
-                                System.out.println(totalDuration);
-                                System.out.println(MAX_DURATION);
-                                if (totalDuration == MAX_DURATION) { //10 rings in total
-                                    restoreAllLightStates();
-                                    cancel();
-                                } else {
-                                    totalDuration++;
+                                while(newMissedCall) {
+                                    System.out.println("ticking");
+                                    System.out.println(totalDuration);
+                                    System.out.println(MAX_DURATION);
+                                    if (totalDuration == MAX_DURATION) { //10 rings in total
+                                        restoreAllLightStates();
+                                        setNewMissedCall(false);
+                                        cancel();
+                                    } else {
+                                        //wait for a second before repeating
+                                        sleepLength(1000);
+                                        totalDuration++;
+                                    }
                                 }
+                                System.out.println("timer has been cancelled for missed calls");
+                                cancel();
                             }
                         }, 0, 1000);
                     }
@@ -302,19 +312,22 @@ public class HueController {
             }
         }
         else{
-            for (final PHLight light : allLights) {
-                for (String lightName : getDefaultLights()) {
+            for (String lightName : getDefaultLights()) {
+                innerLoop:
+                for (final PHLight light : allLights) {
                     if (lightName.equals(light.getName())) {
                         PHLightState newState = new PHLightState();
                         newState.setOn(true);
                         bridge.updateLightState(light, newState);
-                        newState.setBrightness(10);
+                        incrementAndCheck10();
+                        newState.setBrightness(25);
                         bridge.updateLightState(light, newState);
+                        incrementAndCheck10();
+                        break innerLoop;
                     }
                 }
             }
         }
-
     }
 
     public void saveAllLightStates(){
@@ -338,38 +351,45 @@ public class HueController {
             LightState = new ArrayList<>();
             LightState.add(light.getIdentifier());
             LightState.add(brightness);
-            LightState.add(isOn);
             LightState.add(color);
+            LightState.add(isOn);
             LightStates.add(LightState);
         }
     }
 
     public void restoreAllLightStates(){
+        totalCommands = 0;
         System.out.println("restoring all light states");
         PHHueSDK phHueSDK = PHHueSDK.getInstance();
         PHBridge bridge = phHueSDK.getSelectedBridge();
         List<PHLight> allLights = bridge.getResourceCache().getAllLights();
-        for (PHLight light : allLights){
-            for (List<String> lightState : LightStates){
-                if (light.getIdentifier().equals(lightState.get(0))){
+        for (List<String> lightState : LightStates) {
+            innerLoop:
+            for (PHLight light : allLights) {
+                if (light.getIdentifier().equals(lightState.get(0))) {
                     PHLightState state = new PHLightState();
                     state.setBrightness(Integer.parseInt(lightState.get(1)));
                     bridge.updateLightState(light, state);
-                    System.out.println(Integer.parseInt(lightState.get(1)));
-                    state.setOn(Boolean.parseBoolean(lightState.get(2)));
-                    bridge.updateLightState(light, state);
-                    System.out.println(Boolean.parseBoolean(lightState.get(2)));
-                    if (!lightState.get(3).equals("null")) {
-                        state.setHue(Integer.parseInt(lightState.get(3)));
-                        System.out.println(Integer.parseInt(lightState.get(3)));
+                    //System.out.println(Integer.parseInt(lightState.get(1)));
+                    incrementAndCheck10();
+                    if (!lightState.get(2).equals("null")) {
+                        state.setHue(Integer.parseInt(lightState.get(2)));
                         bridge.updateLightState(light, state);
+                        //System.out.println(Integer.parseInt(lightState.get(2)));
+                        incrementAndCheck10();
                     }
+                    state.setOn(Boolean.parseBoolean(lightState.get(3)));
+                    bridge.updateLightState(light, state);
+                    //System.out.println(Boolean.parseBoolean(lightState.get(3)));
+                    incrementAndCheck10();
+                    break innerLoop;
                 }
             }
         }
     }
 
     public void turnOnOnCallLights(){
+        totalCommands = 0;
         System.out.println("turning on on call lights");
 
         PHHueSDK phHueSDK = PHHueSDK.getInstance();
@@ -380,11 +400,14 @@ public class HueController {
             PHLightState state = new PHLightState();
             state.setOn(true);
             bridge.updateLightState(light, state);
+            incrementAndCheck10();
             state.setBrightness(255);
             bridge.updateLightState(light, state);
+            incrementAndCheck10();
             if (light.supportsColor()){
                 state.setHue(0);
                 bridge.updateLightState(light, state);
+                incrementAndCheck10();
             }
         }
     }
@@ -427,11 +450,7 @@ public class HueController {
                                     System.out.println(light.getName() + " is " + getToggle());
                                     setToggle();
                                     //wait for half of a second before repeating
-                                    try {
-                                        Thread.sleep(500);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
+                                    sleepLength(500);
                                 }
                                 cancel();
                             }
@@ -446,5 +465,26 @@ public class HueController {
         System.out.println("no flashing");
         isFlashing = false;
         restoreAllLightStates();
+    }
+
+    public void sleepLength(int sleep){
+        //wait for half of a second before repeating
+        try {
+            Thread.sleep(sleep);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void incrementAndCheck10(){
+        totalCommands++;
+        System.out.println("total commands: " + totalCommands);
+        if (totalCommands >= 10){
+            //cannot exceed 10 commands per second
+            //wait for a bit
+            System.out.println(totalCommands + " >= 10");
+            sleepLength(1500);
+            totalCommands = 0;
+        }
     }
 }

@@ -25,17 +25,28 @@ public class LightsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_lights);
 
         hueController = HueController.getInstance();
-        hueController.restoreAllLightStates();
+        hueController.setNewMissedCall(false);
 
         phHueSDK = PHHueSDK.create();
         PHBridge bridge = phHueSDK.getSelectedBridge();
-        List<PHLight> allLights = bridge.getResourceCache().getAllLights();
+        final List<PHLight> allLights = bridge.getResourceCache().getAllLights();
 
         //connects the listview to the widget created in xml
         listLights = (ListView)findViewById(R.id.listLights);
 
-        LightListControlAdapter adapter = new LightListControlAdapter(this, allLights, hueController);
-        listLights.setAdapter(adapter);
+        PHWizardAlertDialog.getInstance().showProgressDialog(R.string.loading, LightsActivity.this);
+        new Thread(new Runnable() {
+            public void run(){
+                hueController.restoreAllLightStates();
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        LightListControlAdapter adapter = new LightListControlAdapter(LightsActivity.this, allLights, hueController);
+                        listLights.setAdapter(adapter);
+                        PHWizardAlertDialog.getInstance().closeProgressDialog();
+                    }
+                });
+            }
+        }).start();
     }
 
     //action to take when the back button is pressed

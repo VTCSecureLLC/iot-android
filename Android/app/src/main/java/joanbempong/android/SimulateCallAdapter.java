@@ -79,7 +79,7 @@ public class SimulateCallAdapter extends BaseAdapter {
             @SuppressLint("NewApi")
             @Override
             public void onClick(View v) {
-                controller.saveAllLightStates();
+                //controller.saveAllLightStates();
 
                 totalRings = 0;
                 controller.setCallAnswered(false);
@@ -99,8 +99,9 @@ public class SimulateCallAdapter extends BaseAdapter {
                 alert.setNegativeButton("Decline", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        controller.restoreAllLightStates();
                         controller.setCallAnswered(true);
+                        dialog.cancel();
+                        controller.restoreAllLightStates();
                     }
                 });
                 alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -126,7 +127,7 @@ public class SimulateCallAdapter extends BaseAdapter {
                                 double flashRate = Double.parseDouble(contact.getFlashRate());
                                 MAX_TOTAL_RINGS = (int) ((10 / flashRate) * 2);
                                 LONG_PERIOD = (int) (flashRate * 1000);
-
+                                //controller.setTotalCommands(0);
                                 (new Thread() {
                                     public void run() {
                                         Timer timer = new Timer();
@@ -141,8 +142,19 @@ public class SimulateCallAdapter extends BaseAdapter {
                                                             System.out.println(totalRings);
                                                             if (totalRings == MAX_TOTAL_RINGS) { //lasts for 20 seconds
                                                                 if (!controller.getCallAnswered()) {
+                                                                    controller.setNewMissedCall(false);
+                                                                    //give the previous timer for a missed call (if there is any)
+                                                                    //some time to cancel so that a new once can be created.
+                                                                    try {
+                                                                        Thread.sleep(2000);
+                                                                    } catch (InterruptedException e) {
+                                                                        e.printStackTrace();
+                                                                    }
+                                                                    controller.setNewMissedCall(true);
                                                                     controller.simulateAMissedCall();
                                                                     dialog.cancel();
+                                                                    cancel();
+                                                                    break outerLoop;
                                                                 }
                                                                 System.out.println(lightName);
                                                                 System.out.println("timer cancelled");
@@ -153,17 +165,22 @@ public class SimulateCallAdapter extends BaseAdapter {
                                                                 PHLightState state = new PHLightState();
                                                                 state.setOn(controller.getToggle());
                                                                 bridge.updateLightState(light, state);
+                                                                //controller.incrementAndCheck10();
                                                                 state.setBrightness(255);
                                                                 bridge.updateLightState(light, state);
+                                                                //controller.incrementAndCheck10();
                                                                 if (light.supportsColor()){
                                                                     state.setHue(val);
                                                                     bridge.updateLightState(light, state);
+                                                                    //controller.incrementAndCheck10();
                                                                 }
                                                                 System.out.println(light.getName() + " is " + controller.getToggle());
+                                                                //controller.setTotalCommands(0);
 
                                                             } else {
                                                                 System.out.println("call answered/declined -- timer cancelled");
                                                                 cancel();
+                                                                break outerLoop;
                                                             }
                                                         }
                                                     }

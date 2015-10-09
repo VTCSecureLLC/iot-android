@@ -31,10 +31,6 @@ public class LightListControlAdapter extends BaseAdapter{
     int pink = 61100;
     private HueController controller;
 
-
-    private PHHueSDK phHueSDK = PHHueSDK.create();
-    private PHBridge bridge = phHueSDK.getSelectedBridge();
-
     /**
      * creates instance of {@link LightListAdapter} class.
      *
@@ -61,6 +57,7 @@ public class LightListControlAdapter extends BaseAdapter{
         if (convertView == null) {
             convertView = mInflater.inflate(R.layout.lightlist_control, null);
         }
+
 
         //Handle TextView and display string from your list
         final TextView listItemText = (TextView) convertView.findViewById(R.id.lightName);
