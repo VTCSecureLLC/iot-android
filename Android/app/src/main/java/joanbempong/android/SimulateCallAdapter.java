@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.philips.lighting.hue.sdk.PHHueSDK;
 import com.philips.lighting.model.PHBridge;
 import com.philips.lighting.model.PHLight;
-import com.philips.lighting.model.PHLightState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +29,7 @@ public class SimulateCallAdapter extends BaseAdapter {
     private ArrayList<String> myList;
     private Context context;
     private HueController controller;
+    private MyChoices myChoices;
     private PHHueSDK phHueSDK = PHHueSDK.create();
     private PHBridge bridge = phHueSDK.getSelectedBridge();
     private List<PHLight> allLights = bridge.getResourceCache().getAllLights();
@@ -65,6 +65,8 @@ public class SimulateCallAdapter extends BaseAdapter {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.simulatelist_call, null);
         }
+
+        myChoices = MyChoices.getInstance();
 
         //Handle TextView and display string from your list
         final TextView listItemText = (TextView) view.findViewById(R.id.list_item_string);
@@ -111,23 +113,23 @@ public class SimulateCallAdapter extends BaseAdapter {
                     }
                 });
                 //create the alert dialog and show it
-
                 alert.create();
                 //alert.show();
                 final AlertDialog dialog = alert.show();
 
-                //replaces controller.simulateAnIncomingCall()
+                final ACEPattern pattern = ACEPattern.getInstance();
                 String[] nameSplit = listItemText.getText().toString().split("\\s+");
 
                 if (controller.getContactList().size() != 0) {
                     for (final ACEContact contact : controller.getContactList()) {
                         if (nameSplit[0].equals(contact.getFirstName()) && nameSplit[1].equals(contact.getLastName())) {
-                            final int val = controller.getHueValue(contact.getColor());
+                            final int color = myChoices.getHueValue(contact.getColor());
                             if (contact.getUseNotification()) {
                                 double flashRate = Double.parseDouble(contact.getFlashRate());
+                                final String flashPattern = contact.getFlashPattern();
                                 MAX_TOTAL_RINGS = (int) ((10 / flashRate) * 2);
                                 LONG_PERIOD = (int) (flashRate * 1000);
-                                //controller.setTotalCommands(0);
+                                pattern.setIndex(0);
                                 (new Thread() {
                                     public void run() {
                                         Timer timer = new Timer();
@@ -162,21 +164,21 @@ public class SimulateCallAdapter extends BaseAdapter {
                                                                 break outerLoop;
                                                             }
                                                             if (!controller.getCallAnswered()) {
-                                                                PHLightState state = new PHLightState();
-                                                                state.setOn(controller.getToggle());
-                                                                bridge.updateLightState(light, state);
-                                                                //controller.incrementAndCheck10();
-                                                                state.setBrightness(255);
-                                                                bridge.updateLightState(light, state);
-                                                                //controller.incrementAndCheck10();
-                                                                if (light.supportsColor()){
-                                                                    state.setHue(val);
-                                                                    bridge.updateLightState(light, state);
-                                                                    //controller.incrementAndCheck10();
+                                                                if (flashPattern.equals("None")) {
+                                                                    pattern.nonePattern(light, color);
                                                                 }
-                                                                System.out.println(light.getName() + " is " + controller.getToggle());
-                                                                //controller.setTotalCommands(0);
-
+                                                                else if (flashPattern.equals("Color")) {
+                                                                    pattern.colorPattern(light);
+                                                                }
+                                                                else if (flashPattern.equals("Short On")) {
+                                                                    pattern.shortOnPattern(light, LONG_PERIOD/4, color);
+                                                                }
+                                                                else if (flashPattern.equals("Long On")) {
+                                                                    pattern.longOnPattern(light, LONG_PERIOD/4, color);
+                                                                }
+                                                                /*else if (flashPattern.equals("Pulse")) {
+                                                                    pattern.pulsePattern(light, color);
+                                                                }*/
                                                             } else {
                                                                 System.out.println("call answered/declined -- timer cancelled");
                                                                 cancel();
@@ -186,6 +188,7 @@ public class SimulateCallAdapter extends BaseAdapter {
                                                     }
                                                 }
                                                 controller.setToggle();
+                                                pattern.incrementIndex();
                                                 totalRings++;
                                             }
                                         }, 0, LONG_PERIOD);

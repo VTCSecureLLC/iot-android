@@ -26,15 +26,16 @@ public class MyChoices {
         durationList.add("Always On (energy saving)");
 
         flashPatternList.add("--");
-        flashPatternList.add("Slow");
-        flashPatternList.add("Heartbeat");
-        flashPatternList.add("Panic");
+        flashPatternList.add("None");
+        flashPatternList.add("Color");
+        flashPatternList.add("Short On");
+        flashPatternList.add("Long On");
+        flashPatternList.add("Pulse");
 
         flashRateList.add("--");
-        flashRateList.add(".5");
-        flashRateList.add("1");
         flashRateList.add("1.5");
-        flashRateList.add("2");
+        flashRateList.add("2.5");
+        flashRateList.add("3.5");
 
         colorList.add("--");
         colorList.add("warm white");
@@ -66,10 +67,26 @@ public class MyChoices {
     public ArrayList<String> getFlashPatternList(){
         return this.flashPatternList;
     }
+
     public ArrayList<String> getFlashRateList(){
         return this.flashRateList;
     }
+
     public ArrayList<String> getColorList(){
         return this.colorList;
+    }
+
+    public int getHueValue(String color){
+        switch (color){
+            case "warm white": return 12750;
+            case "red" : return 0;
+            case "orange" : return 6375;
+            case "yellow" : return 12750;
+            case "green" : return 25500;
+            case "blue" : return 46920;
+            case "purple" : return 50100;
+            case "pink" : return 61100;
+        }
+        return -1;
     }
 }

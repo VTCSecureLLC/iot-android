@@ -124,6 +124,12 @@
     <string name="use_default">set default values</string>
     <string name="title_activity_set_hue_default_values">My Notifications</string>
     <string name="set_default_values">Set your preferred default values below.</string>
+    <string name="title_activity_wink_authentication">Wink Authentication Activity</string>
+    <string name="username">username:</string>
+    <string name="password">password:</string>
+    <string name="btn_sign_up">sign up</string>
+    <string name="btn_log_in">log in</string>
+    <string name="title_activity_wink_log_in">Wink Log In</string>
 
 
 </resources>

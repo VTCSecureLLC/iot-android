@@ -55,7 +55,6 @@ public class HueController {
     private boolean defaultValues = false;
     private boolean isFlashing = false;
     private boolean newMissedCall = false;
-    private boolean exitingMissedCall = false;
 
 
 
@@ -410,20 +409,6 @@ public class HueController {
                 incrementAndCheck10();
             }
         }
-    }
-
-    public int getHueValue(String color){
-        switch (color){
-            case "warm white": return 12750;
-            case "red" : return 0;
-            case "orange" : return 6375;
-            case "yellow" : return 12750;
-            case "green" : return 25500;
-            case "blue" : return 46920;
-            case "purple" : return 50100;
-            case "pink" : return 61100;
-        }
-        return -1;
     }
 
     public void startFlashing(final PHLight light){
