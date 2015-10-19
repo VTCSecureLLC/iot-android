@@ -4,7 +4,7 @@
 
     <uses-sdk
         android:minSdkVersion="8"
-        android:targetSdkVersion="17" />
+        android:targetSdkVersion="17"/>
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -96,10 +96,6 @@
         <activity
             android:name=".SetHueDefaultValuesActivity"
             android:label="@string/title_activity_set_hue_default_values" >
-        </activity>
-        <activity
-            android:name=".WinkLogInActivity"
-            android:label="@string/title_activity_wink_log_in" >
         </activity>
     </application>
 

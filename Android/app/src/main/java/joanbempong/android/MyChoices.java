@@ -27,32 +27,33 @@ public class MyChoices {
 
         flashPatternList.add("--");
         flashPatternList.add("None");
-        flashPatternList.add("Color");
         flashPatternList.add("Short On");
         flashPatternList.add("Long On");
-        flashPatternList.add("Pulse");
+        flashPatternList.add("Color");
+        flashPatternList.add("Fire");
+        flashPatternList.add("RIT");
+        flashPatternList.add("Cloudy Sky");
+        flashPatternList.add("Grassy Green");
+        flashPatternList.add("Lavender");
+        flashPatternList.add("Bloody Red");
+        flashPatternList.add("Spring Mist");
 
         flashRateList.add("--");
         flashRateList.add("1.5");
         flashRateList.add("2.5");
         flashRateList.add("3.5");
 
+        ACEColors colors = ACEColors.getInstance();
         colorList.add("--");
-        colorList.add("warm white");
-        colorList.add("red");
-        colorList.add("orange");
-        colorList.add("yellow");
-        colorList.add("green");
-        colorList.add("blue");
-        colorList.add("purple");
-        colorList.add("pink");
+        for (String colorName : colors.getColorsList().keySet()){
+            colorList.add(colorName);
+        }
     }
 
     public static MyChoices getInstance() {
         if(instance == null) {
             instance = new MyChoices();
         }
-
         return instance;
     }
 

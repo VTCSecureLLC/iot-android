@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import com.philips.lighting.hue.sdk.PHHueSDK;
 import com.philips.lighting.model.PHBridge;
 import com.philips.lighting.model.PHLight;
+import com.philips.lighting.model.PHLightState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +34,6 @@ public class SetHueDefaultValuesActivity extends AppCompatActivity {
     private Spinner durationList, flashPatternList, flashRateList, colorList;
 
     private Button saveBtn;
-    private ArrayAdapter<CharSequence> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +70,10 @@ public class SetHueDefaultValuesActivity extends AppCompatActivity {
 
         //creates an on click listener
         saveBtn.setOnClickListener(saveBtnOnClickListener);
+        flashPatternList.setOnItemSelectedListener(flashPatternListOnItemSelectedListener);
+        colorList.setOnItemSelectedListener(colorListOnItemSelectedListener);
+
+        hueController.saveAllLightStates();
     }
 
     public void addItemsToDurationList(){
@@ -125,18 +130,131 @@ public class SetHueDefaultValuesActivity extends AppCompatActivity {
             }else if (colorList.getSelectedItem().equals("--")){
                 Toast.makeText(SetHueDefaultValuesActivity.this, "Please choose a color for your default incoming/missed calls.", Toast.LENGTH_SHORT).show();
             }
-            else{
+            else {
                 hueController.saveDefaultValues(String.valueOf(durationList.getSelectedItem()),
                         String.valueOf(flashPatternList.getSelectedItem()), String.valueOf(flashRateList.getSelectedItem()),
                         String.valueOf(colorList.getSelectedItem()));
                 Toast.makeText(SetHueDefaultValuesActivity.this, "The default values have been saved", Toast.LENGTH_SHORT).show();
                 hueController.setDefaultValues(true);
                 hueController.updateContacts();
+                hueController.restoreAllLightStates();
                 // navigate to the previous page
                 finish();
             }
         }
     };
+
+    AdapterView.OnItemSelectedListener flashPatternListOnItemSelectedListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            System.out.println(flashPatternList.getSelectedItem());
+            //show this pattern
+            showThisPattern(flashPatternList.getSelectedItem().toString(), false);
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+    };
+
+    AdapterView.OnItemSelectedListener colorListOnItemSelectedListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            System.out.println(colorList.getSelectedItem());
+            //show this pattern
+            showThisColor(colorList.getSelectedItem().toString());
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+    };
+
+    public void showThisPattern(String patternName, Boolean repeat){
+        ACEPattern pattern = ACEPattern.getInstance();
+        PHHueSDK phHueSDK = PHHueSDK.getInstance();
+        PHBridge bridge = phHueSDK.getSelectedBridge();
+        List<PHLight> allLights = bridge.getResourceCache().getAllLights();
+        if (!patternName.equals("--")) {
+            for (String defaultLight : hueController.getDefaultLights()) {
+                for (PHLight light : allLights) {
+                    if (defaultLight.equals(light.getName())) {
+                        if (light.supportsColor()) {
+                            pattern.setPatternInterrupted(true);
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            pattern.setPatternInterrupted(false);
+                            switch (patternName) {
+                                case "None":
+                                    pattern.nonePattern(light, repeat);
+                                    break;
+                                case "Short On":
+                                    pattern.shortOnPattern(light, repeat);
+                                    break;
+                                case "Long On":
+                                    pattern.longOnPattern(light, repeat);
+                                    break;
+                                case "Color":
+                                    pattern.colorPattern(light, repeat);
+                                    break;
+                                case "Fire":
+                                    pattern.firePattern(light, repeat);
+                                    break;
+                                case "RIT":
+                                    pattern.ritPattern(light, repeat);
+                                    break;
+                                case "Cloudy Sky":
+                                    pattern.cloudySkyPattern(light, repeat);
+                                    break;
+                                case "Grassy Green":
+                                    pattern.grassyGreenPattern(light, repeat);
+                                    break;
+                                case "Lavender":
+                                    pattern.lavenderPattern(light, repeat);
+                                    break;
+                                case "Bloody Red":
+                                    pattern.bloodyRedPattern(light, repeat);
+                                    break;
+                                case "Spring Mist":
+                                    pattern.springMistPattern(light, repeat);
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void showThisColor(String colorName){
+        PHHueSDK phHueSDK = PHHueSDK.getInstance();
+        PHBridge bridge = phHueSDK.getSelectedBridge();
+        List<PHLight> allLights = bridge.getResourceCache().getAllLights();
+        if (!colorName.equals("--")) {
+            for (String defaultLight : hueController.getDefaultLights()) {
+                for (PHLight light : allLights) {
+                    if (defaultLight.equals(light.getName())) {
+                        if (light.supportsColor()) {
+                            ACEColors colors = ACEColors.getInstance();
+                            PHLightState state = new PHLightState();
+                            state.setOn(true);
+                            bridge.updateLightState(light, state);
+                            state.setX(Float.valueOf(String.valueOf(colors.getColorsList().get(colorName)[0])));
+                            bridge.updateLightState(light, state);
+                            state.setY(Float.valueOf(String.valueOf(colors.getColorsList().get(colorName)[1])));
+                            bridge.updateLightState(light, state);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

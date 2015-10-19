@@ -130,72 +130,95 @@ public class SimulateCallAdapter extends BaseAdapter {
                                 MAX_TOTAL_RINGS = (int) ((10 / flashRate) * 2);
                                 LONG_PERIOD = (int) (flashRate * 1000);
                                 pattern.setIndex(0);
+
+                                for (final PHLight light : allLights) {
+                                    for (String lightName : controller.getDefaultLights()) {
+                                        if (lightName.equals(light.getName())) {
+                                            boolean repeat = true;
+                                            pattern.setUseThisPattern(true);
+                                            pattern.setPatternInterrupted(false);
+                                            switch (flashPattern) {
+                                                case "None":
+                                                    pattern.nonePattern(light, repeat);
+                                                    break;
+                                                case "Short On":
+                                                    pattern.shortOnPattern(light, repeat);
+                                                    break;
+                                                case "Long On":
+                                                    pattern.longOnPattern(light, repeat);
+                                                    break;
+                                                case "Color":
+                                                    pattern.colorPattern(light, repeat);
+                                                    break;
+                                                case "Fire":
+                                                    pattern.firePattern(light, repeat);
+                                                    break;
+                                                case "RIT":
+                                                    pattern.ritPattern(light, repeat);
+                                                    break;
+                                                case "Cloudy Sky":
+                                                    pattern.cloudySkyPattern(light, repeat);
+                                                    break;
+                                                case "Grassy Green":
+                                                    pattern.grassyGreenPattern(light, repeat);
+                                                    break;
+                                                case "Lavender":
+                                                    pattern.lavenderPattern(light, repeat);
+                                                    break;
+                                                case "Bloody Red":
+                                                    pattern.bloodyRedPattern(light, repeat);
+                                                    break;
+                                                case "Spring Mist":
+                                                    pattern.springMistPattern(light, repeat);
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+
                                 (new Thread() {
                                     public void run() {
                                         Timer timer = new Timer();
                                         timer.schedule(new TimerTask() {
                                             @Override
                                             public void run() {
-                                                outerLoop:
-                                                for (final PHLight light : allLights) {
-                                                    for (String lightName : controller.getDefaultLights()) {
-                                                        if (lightName.equals(light.getName())) {
-                                                            System.out.println("ticking");
-                                                            System.out.println(totalRings);
-                                                            if (totalRings == MAX_TOTAL_RINGS) { //lasts for 20 seconds
-                                                                if (!controller.getCallAnswered()) {
-                                                                    controller.setNewMissedCall(false);
-                                                                    //give the previous timer for a missed call (if there is any)
-                                                                    //some time to cancel so that a new once can be created.
-                                                                    try {
-                                                                        Thread.sleep(2000);
-                                                                    } catch (InterruptedException e) {
-                                                                        e.printStackTrace();
-                                                                    }
-                                                                    controller.setNewMissedCall(true);
-                                                                    controller.simulateAMissedCall();
-                                                                    dialog.cancel();
-                                                                    cancel();
-                                                                    break outerLoop;
-                                                                }
-                                                                System.out.println(lightName);
-                                                                System.out.println("timer cancelled");
-                                                                cancel();
-                                                                break outerLoop;
-                                                            }
-                                                            if (!controller.getCallAnswered()) {
-                                                                if (flashPattern.equals("None")) {
-                                                                    pattern.nonePattern(light, color);
-                                                                }
-                                                                else if (flashPattern.equals("Color")) {
-                                                                    pattern.colorPattern(light);
-                                                                }
-                                                                else if (flashPattern.equals("Short On")) {
-                                                                    pattern.shortOnPattern(light, LONG_PERIOD/4, color);
-                                                                }
-                                                                else if (flashPattern.equals("Long On")) {
-                                                                    pattern.longOnPattern(light, LONG_PERIOD/4, color);
-                                                                }
-                                                                /*else if (flashPattern.equals("Pulse")) {
-                                                                    pattern.pulsePattern(light, color);
-                                                                }*/
-                                                            } else {
-                                                                System.out.println("call answered/declined -- timer cancelled");
-                                                                cancel();
-                                                                break outerLoop;
-                                                            }
+                                                System.out.println("ticking");
+                                                System.out.println(totalRings);
+                                                if (totalRings >= 20) { //lasts for 20 seconds
+                                                    if (!controller.getCallAnswered()) {
+                                                        controller.setNewMissedCall(false);
+                                                        //give the previous timer for a missed call (if there is any)
+                                                        //some time to cancel so that a new once can be created.
+                                                        try {
+                                                            Thread.sleep(2000);
+                                                        } catch (InterruptedException e) {
+                                                            e.printStackTrace();
                                                         }
+                                                        controller.setNewMissedCall(true);
+                                                        controller.simulateAMissedCall();
+                                                        dialog.cancel();
+                                                        pattern.setUseThisPattern(false);
+                                                        pattern.setPatternInterrupted(true);
+                                                        cancel();
                                                     }
+                                                    System.out.println("timer cancelled");
+                                                    pattern.setUseThisPattern(false);
+                                                    pattern.setPatternInterrupted(true);
+                                                    cancel();
                                                 }
-                                                controller.setToggle();
-                                                pattern.incrementIndex();
-                                                totalRings++;
+                                                if (!controller.getCallAnswered()) {
+                                                    totalRings++;
+                                                } else {
+                                                    System.out.println("call answered/declined -- timer cancelled");
+                                                    pattern.setUseThisPattern(false);
+                                                    pattern.setPatternInterrupted(true);
+                                                    cancel();
+                                                }
                                             }
-                                        }, 0, LONG_PERIOD);
+                                        }, 0, 1000);
                                     }
                                 }).start();
-                            }
-                            else{ //do the same thing but no notification
+                            } else { //do the same thing but no notification
                                 double flashRate = 1;
                                 MAX_TOTAL_RINGS = (int) ((10 / flashRate) * 2);
                                 LONG_PERIOD = (int) (flashRate * 1000);
@@ -208,7 +231,7 @@ public class SimulateCallAdapter extends BaseAdapter {
                                             public void run() {
                                                 System.out.println("ticking");
                                                 System.out.println(totalRings);
-                                                if (totalRings == MAX_TOTAL_RINGS) { //20 rings in total
+                                                if (totalRings == 20) { //20 rings in total
                                                     if (!controller.getCallAnswered()) {
                                                         dialog.cancel();
                                                     }
@@ -221,17 +244,15 @@ public class SimulateCallAdapter extends BaseAdapter {
                                                 }
                                                 totalRings++;
                                             }
-                                        }, 0, LONG_PERIOD);
+                                        }, 0, 1000);
                                     }
                                 }).start();
                             }
                         }
                     }
                 }
-                notifyDataSetChanged();
             }
         });
-
         return view;
     }
 

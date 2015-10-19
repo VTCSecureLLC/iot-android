@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import com.philips.lighting.hue.sdk.PHHueSDK;
 import com.philips.lighting.model.PHBridge;
 import com.philips.lighting.model.PHLight;
+import com.philips.lighting.model.PHLightState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,6 +86,11 @@ public class EditContactActivity extends AppCompatActivity {
         saveBtn.setOnClickListener(saveBtnOnClickListener);
         defaultSwitch.setOnCheckedChangeListener(defaultSwitchOnCheckedChangeListener);
         notificationSwitch.setOnCheckedChangeListener(notificationSwitchOnCheckedChangeListener);
+        flashPatternList.setOnItemSelectedListener(flashPatternListOnItemSelectedListener);
+        colorList.setOnItemSelectedListener(colorListOnItemSelectedListener);
+
+        hueController.saveAllLightStates();
+
 
         scrollView = (ScrollView)findViewById(R.id.scrollView);
 
@@ -165,6 +172,7 @@ public class EditContactActivity extends AppCompatActivity {
                         int duration = Toast.LENGTH_SHORT;
                         Toast toast = Toast.makeText(context, text, duration);
                         toast.show();
+                        hueController.restoreAllLightStates();
 
                         // navigate to the MyContacts page
                         startActivity(new Intent(EditContactActivity.this, MyContactsActivity.class));
@@ -182,6 +190,7 @@ public class EditContactActivity extends AppCompatActivity {
                     int duration = Toast.LENGTH_SHORT;
                     Toast toast = Toast.makeText(context, text, duration);
                     toast.show();
+                    hueController.restoreAllLightStates();
 
                     // navigate to the MyContacts page
                     startActivity(new Intent(EditContactActivity.this, MyContactsActivity.class));
@@ -197,6 +206,7 @@ public class EditContactActivity extends AppCompatActivity {
                 int duration = Toast.LENGTH_SHORT;
                 Toast toast = Toast.makeText(context, text, duration);
                 toast.show();
+                hueController.restoreAllLightStates();
 
                 // navigate to the MyContacts page
                 startActivity(new Intent(EditContactActivity.this, MyContactsActivity.class));
@@ -276,6 +286,119 @@ public class EditContactActivity extends AppCompatActivity {
             }
         }
     };
+
+    AdapterView.OnItemSelectedListener flashPatternListOnItemSelectedListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            System.out.println(flashPatternList.getSelectedItem());
+            //show this pattern
+            showThisPattern(flashPatternList.getSelectedItem().toString(), false);
+
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+    };
+
+    AdapterView.OnItemSelectedListener colorListOnItemSelectedListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            System.out.println(colorList.getSelectedItem());
+            //show this pattern
+            showThisColor(colorList.getSelectedItem().toString());
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+    };
+
+    public void showThisPattern(String patternName, Boolean repeat){
+        ACEPattern pattern = ACEPattern.getInstance();
+        PHHueSDK phHueSDK = PHHueSDK.getInstance();
+        PHBridge bridge = phHueSDK.getSelectedBridge();
+        List<PHLight> allLights = bridge.getResourceCache().getAllLights();
+        if (!patternName.equals("--")) {
+            for (String defaultLight : hueController.getDefaultLights()) {
+                for (PHLight light : allLights) {
+                    if (defaultLight.equals(light.getName())) {
+                        if (light.supportsColor()) {
+                            pattern.setPatternInterrupted(true);
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            pattern.setPatternInterrupted(false);
+                            switch (patternName) {
+                                case "None":
+                                    pattern.nonePattern(light, repeat);
+                                    break;
+                                case "Short On":
+                                    pattern.shortOnPattern(light, repeat);
+                                    break;
+                                case "Long On":
+                                    pattern.longOnPattern(light, repeat);
+                                    break;
+                                case "Color":
+                                    pattern.colorPattern(light, repeat);
+                                    break;
+                                case "Fire":
+                                    pattern.firePattern(light, repeat);
+                                    break;
+                                case "RIT":
+                                    pattern.ritPattern(light, repeat);
+                                    break;
+                                case "Cloudy Sky":
+                                    pattern.cloudySkyPattern(light, repeat);
+                                    break;
+                                case "Grassy Green":
+                                    pattern.grassyGreenPattern(light, repeat);
+                                    break;
+                                case "Lavender":
+                                    pattern.lavenderPattern(light, repeat);
+                                    break;
+                                case "Bloody Red":
+                                    pattern.bloodyRedPattern(light, repeat);
+                                    break;
+                                case "Spring Mist":
+                                    pattern.springMistPattern(light, repeat);
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void showThisColor(String colorName){
+        PHHueSDK phHueSDK = PHHueSDK.getInstance();
+        PHBridge bridge = phHueSDK.getSelectedBridge();
+        List<PHLight> allLights = bridge.getResourceCache().getAllLights();
+        if (!colorName.equals("--")) {
+            for (String defaultLight : hueController.getDefaultLights()) {
+                for (PHLight light : allLights) {
+                    if (defaultLight.equals(light.getName())) {
+                        if (light.supportsColor()) {
+                            ACEColors colors = ACEColors.getInstance();
+                            PHLightState state = new PHLightState();
+                            state.setOn(true);
+                            bridge.updateLightState(light, state);
+                            state.setX(Float.valueOf(String.valueOf(colors.getColorsList().get(colorName)[0])));
+                            bridge.updateLightState(light, state);
+                            state.setY(Float.valueOf(String.valueOf(colors.getColorsList().get(colorName)[1])));
+                            bridge.updateLightState(light, state);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     //action to take when the back button is pressed
     @Override
