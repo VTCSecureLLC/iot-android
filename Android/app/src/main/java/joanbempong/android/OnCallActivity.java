@@ -19,12 +19,6 @@ public class OnCallActivity extends AppCompatActivity {
         setContentView(R.layout.activity_on_call);
 
         hueController = HueController.getInstance();
-        new Thread(new Runnable() {
-            public void run(){
-                hueController.turnOnOnCallLights();
-
-            }
-        }).start();
 
         //connects the button to the widgets created in xml
         hangUpBtn = (Button)findViewById(R.id.hangUpBtn);
@@ -37,6 +31,7 @@ public class OnCallActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
+            hueController.setOnCall(false);
             new Thread(new Runnable() {
                 public void run(){
                     hueController.restoreAllLightStates();

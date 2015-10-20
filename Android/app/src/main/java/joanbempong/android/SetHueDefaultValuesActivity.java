@@ -1,13 +1,14 @@
 package joanbempong.android;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -20,7 +21,7 @@ import com.philips.lighting.model.PHLightState;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SetHueDefaultValuesActivity extends AppCompatActivity {
+public class SetHueDefaultValuesActivity extends Activity {
 
     private PHHueSDK phHueSDK;
     private HueController hueController;
@@ -31,7 +32,8 @@ public class SetHueDefaultValuesActivity extends AppCompatActivity {
     private DefaultLightChoiceAdapter defaultAdapter;
 
     private ListView lightChoices;
-    private Spinner durationList, flashPatternList, flashRateList, colorList;
+    private Spinner durationList, flashPatternList, colorList;
+    private EditText flashRateValue;
 
     private Button saveBtn;
 
@@ -56,13 +58,15 @@ public class SetHueDefaultValuesActivity extends AppCompatActivity {
 
         durationList = (Spinner)findViewById(R.id.durationList);
         flashPatternList = (Spinner)findViewById(R.id.flashPatternList);
-        flashRateList = (Spinner)findViewById(R.id.flashRateList);
+        //flashRateList = (Spinner)findViewById(R.id.flashRateList);
         colorList = (Spinner)findViewById(R.id.colorList);
+
+        flashRateValue = (EditText)findViewById(R.id.flashRateValue);
 
         //adds items to the spinners
         addItemsToDurationList();
         addItemsToFlashPatternList();
-        addItemsToFlashRateList();
+        //addItemsToFlashRateList();
         addItemsToColorList();
 
         //connects the button to the widgets created in xml
@@ -96,7 +100,7 @@ public class SetHueDefaultValuesActivity extends AppCompatActivity {
         flashPatternList.setSelection(selected);
     }
 
-    public void addItemsToFlashRateList(){
+    /*public void addItemsToFlashRateList(){
         ArrayList<String> choices = myChoices.getFlashRateList();
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, choices);
         flashRateList.setAdapter(adapter);
@@ -104,7 +108,7 @@ public class SetHueDefaultValuesActivity extends AppCompatActivity {
         //set the current selected item
         int selected = adapter.getPosition(hueController.getDefaultFlashRate());
         flashRateList.setSelection(selected);
-    }
+    }*/
 
     public void addItemsToColorList(){
         ArrayList<String> choices = myChoices.getColorList();
@@ -119,21 +123,30 @@ public class SetHueDefaultValuesActivity extends AppCompatActivity {
     View.OnClickListener saveBtnOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View arg0) {
+            ACEPattern pattern = ACEPattern.getInstance();
             if (hueController.getDefaultLights().size() == 0){
                 Toast.makeText(SetHueDefaultValuesActivity.this, "Please choose a light or more for your default incoming/missed calls.", Toast.LENGTH_SHORT).show();
             }else if (durationList.getSelectedItem().equals("--")){
                 Toast.makeText(SetHueDefaultValuesActivity.this, "Please choose a duration for your default missed calls.", Toast.LENGTH_SHORT).show();
             }else if (flashPatternList.getSelectedItem().equals("--")){
                 Toast.makeText(SetHueDefaultValuesActivity.this, "Please choose a flash pattern for your default incoming calls.", Toast.LENGTH_SHORT).show();
-            }else if (flashRateList.getSelectedItem().equals("--")){
-                Toast.makeText(SetHueDefaultValuesActivity.this, "Please choose a flash rate for your default incoming calls.", Toast.LENGTH_SHORT).show();
+            }
+            /*else if (flashRateList.getSelectedItem().equals("--")){
+                Toast.makeText(HueDefaultValuesActivity.this, "Please choose a flash rate for your default incoming calls.", Toast.LENGTH_SHORT).show();
+            }*/
+            else if (flashRateValue.getText().toString().equals("")) {
+                Toast.makeText(SetHueDefaultValuesActivity.this, "Please choose a flash rate value for your default incoming calls.", Toast.LENGTH_SHORT).show();
             }else if (colorList.getSelectedItem().equals("--")){
                 Toast.makeText(SetHueDefaultValuesActivity.this, "Please choose a color for your default incoming/missed calls.", Toast.LENGTH_SHORT).show();
             }
-            else {
+            else{
                 hueController.saveDefaultValues(String.valueOf(durationList.getSelectedItem()),
-                        String.valueOf(flashPatternList.getSelectedItem()), String.valueOf(flashRateList.getSelectedItem()),
+                        String.valueOf(flashPatternList.getSelectedItem()), String.valueOf(flashRateValue.getText()),
                         String.valueOf(colorList.getSelectedItem()));
+
+                //pattern has been interrupted, stop it
+                pattern.setPatternInterrupted(true);
+
                 Toast.makeText(SetHueDefaultValuesActivity.this, "The default values have been saved", Toast.LENGTH_SHORT).show();
                 hueController.setDefaultValues(true);
                 hueController.updateContacts();
@@ -177,6 +190,8 @@ public class SetHueDefaultValuesActivity extends AppCompatActivity {
         PHHueSDK phHueSDK = PHHueSDK.getInstance();
         PHBridge bridge = phHueSDK.getSelectedBridge();
         List<PHLight> allLights = bridge.getResourceCache().getAllLights();
+        ACEColors colors = ACEColors.getInstance();
+        Double[] colorXY = {colors.getColorsList().get("white")[0], colors.getColorsList().get("white")[1]};
         if (!patternName.equals("--")) {
             for (String defaultLight : hueController.getDefaultLights()) {
                 for (PHLight light : allLights) {
@@ -191,37 +206,37 @@ public class SetHueDefaultValuesActivity extends AppCompatActivity {
                             pattern.setPatternInterrupted(false);
                             switch (patternName) {
                                 case "None":
-                                    pattern.nonePattern(light, repeat);
+                                    pattern.nonePattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
                                     break;
                                 case "Short On":
-                                    pattern.shortOnPattern(light, repeat);
+                                    pattern.shortOnPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
                                     break;
                                 case "Long On":
-                                    pattern.longOnPattern(light, repeat);
+                                    pattern.longOnPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
                                     break;
                                 case "Color":
-                                    pattern.colorPattern(light, repeat);
+                                    pattern.colorPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
                                     break;
                                 case "Fire":
-                                    pattern.firePattern(light, repeat);
+                                    pattern.firePattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
                                     break;
                                 case "RIT":
-                                    pattern.ritPattern(light, repeat);
+                                    pattern.ritPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
                                     break;
                                 case "Cloudy Sky":
-                                    pattern.cloudySkyPattern(light, repeat);
+                                    pattern.cloudySkyPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
                                     break;
                                 case "Grassy Green":
-                                    pattern.grassyGreenPattern(light, repeat);
+                                    pattern.grassyGreenPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
                                     break;
                                 case "Lavender":
-                                    pattern.lavenderPattern(light, repeat);
+                                    pattern.lavenderPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
                                     break;
                                 case "Bloody Red":
-                                    pattern.bloodyRedPattern(light, repeat);
+                                    pattern.bloodyRedPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
                                     break;
                                 case "Spring Mist":
-                                    pattern.springMistPattern(light, repeat);
+                                    pattern.springMistPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
                                     break;
                             }
                         }

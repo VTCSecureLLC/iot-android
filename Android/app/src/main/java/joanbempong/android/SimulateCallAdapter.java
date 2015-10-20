@@ -72,8 +72,6 @@ public class SimulateCallAdapter extends BaseAdapter {
         final TextView listItemText = (TextView) view.findViewById(R.id.list_item_string);
         listItemText.setText(myList.get(position));
 
-        //String[] nameSplit = listItemText.getText)_.toString().split("\\s+");
-
         //Handle buttons and add onClickListeners
         ImageButton simulateBtn = (ImageButton) view.findViewById(R.id.simulate_btn);
 
@@ -92,7 +90,15 @@ public class SimulateCallAdapter extends BaseAdapter {
                 alert.setPositiveButton("Answer", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        ACEPattern pattern = ACEPattern.getInstance();
+                        pattern.setPatternInterrupted(true);
                         controller.setCallAnswered(true);
+                        controller.setOnCall(true);
+                        /*try {
+                            Thread.sleep(1500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }*/
                         // navigate to the MyContacts page
                         context.startActivity(new Intent(context, OnCallActivity.class));
                     }
@@ -101,9 +107,11 @@ public class SimulateCallAdapter extends BaseAdapter {
                 alert.setNegativeButton("Decline", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        ACEPattern pattern = ACEPattern.getInstance();
+                        pattern.setPatternInterrupted(true);
                         controller.setCallAnswered(true);
                         dialog.cancel();
-                        controller.restoreAllLightStates();
+                        //controller.restoreAllLightStates();
                     }
                 });
                 alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -123,7 +131,8 @@ public class SimulateCallAdapter extends BaseAdapter {
                 if (controller.getContactList().size() != 0) {
                     for (final ACEContact contact : controller.getContactList()) {
                         if (nameSplit[0].equals(contact.getFirstName()) && nameSplit[1].equals(contact.getLastName())) {
-                            final int color = myChoices.getHueValue(contact.getColor());
+                            ACEColors colors = ACEColors.getInstance();
+                            Double[] colorXY = {colors.getColorsList().get(contact.getColor())[0], colors.getColorsList().get(contact.getColor())[1]};
                             if (contact.getUseNotification()) {
                                 double flashRate = Double.parseDouble(contact.getFlashRate());
                                 final String flashPattern = contact.getFlashPattern();
@@ -139,37 +148,37 @@ public class SimulateCallAdapter extends BaseAdapter {
                                             pattern.setPatternInterrupted(false);
                                             switch (flashPattern) {
                                                 case "None":
-                                                    pattern.nonePattern(light, repeat);
+                                                    pattern.nonePattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
                                                     break;
                                                 case "Short On":
-                                                    pattern.shortOnPattern(light, repeat);
+                                                    pattern.shortOnPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
                                                     break;
                                                 case "Long On":
-                                                    pattern.longOnPattern(light, repeat);
+                                                    pattern.longOnPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
                                                     break;
                                                 case "Color":
-                                                    pattern.colorPattern(light, repeat);
+                                                    pattern.colorPattern(light, repeat, Long.valueOf(contact.getFlashRate()));
                                                     break;
                                                 case "Fire":
-                                                    pattern.firePattern(light, repeat);
+                                                    pattern.firePattern(light, repeat, Long.valueOf(contact.getFlashRate()));
                                                     break;
                                                 case "RIT":
-                                                    pattern.ritPattern(light, repeat);
+                                                    pattern.ritPattern(light, repeat, Long.valueOf(contact.getFlashRate()));
                                                     break;
                                                 case "Cloudy Sky":
-                                                    pattern.cloudySkyPattern(light, repeat);
+                                                    pattern.cloudySkyPattern(light, repeat, Long.valueOf(contact.getFlashRate()));
                                                     break;
                                                 case "Grassy Green":
-                                                    pattern.grassyGreenPattern(light, repeat);
+                                                    pattern.grassyGreenPattern(light, repeat, Long.valueOf(contact.getFlashRate()));
                                                     break;
                                                 case "Lavender":
-                                                    pattern.lavenderPattern(light, repeat);
+                                                    pattern.lavenderPattern(light, repeat, Long.valueOf(contact.getFlashRate()));
                                                     break;
                                                 case "Bloody Red":
-                                                    pattern.bloodyRedPattern(light, repeat);
+                                                    pattern.bloodyRedPattern(light, repeat, Long.valueOf(contact.getFlashRate()));
                                                     break;
                                                 case "Spring Mist":
-                                                    pattern.springMistPattern(light, repeat);
+                                                    pattern.springMistPattern(light, repeat, Long.valueOf(contact.getFlashRate()));
                                                     break;
                                             }
                                         }
@@ -195,7 +204,6 @@ public class SimulateCallAdapter extends BaseAdapter {
                                                             e.printStackTrace();
                                                         }
                                                         controller.setNewMissedCall(true);
-                                                        controller.simulateAMissedCall();
                                                         dialog.cancel();
                                                         pattern.setUseThisPattern(false);
                                                         pattern.setPatternInterrupted(true);

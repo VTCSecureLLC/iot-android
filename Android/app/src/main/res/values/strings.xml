@@ -59,7 +59,7 @@
     <string name="light_choice">Light(s)</string>
     <string name="duration">Duration for Missed Calls (in minutes)</string>
     <string name="flash_pattern">Flash Pattern for Incoming Calls \n (a preview will be shown)</string>
-    <string name="flash_rate">Flash Rate for Incoming Calls \n (in seconds)</string>
+    <string name="flash_rate">Flash Rate for Incoming Calls \n (in milliseconds)</string>
     <string name="color">Color \n (a preview will be shown)</string>
     <string-array name="duration_list">
         <item>--</item>

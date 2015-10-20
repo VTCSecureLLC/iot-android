@@ -35,10 +35,10 @@ public class AddContactActivity extends AppCompatActivity {
 
     private List<PHLight> allLights;
 
-    private Spinner flashPatternList, flashRateList, colorList;
+    private Spinner flashPatternList, colorList;
     private Switch defaultSwitch, notificationSwitch;
     private ScrollView scrollView;
-    private EditText firstName, lastName, phoneNumber;
+    private EditText firstName, lastName, phoneNumber, flashRateValue;
     private Button saveBtn;
 
     ArrayAdapter<String> adapterFP, adapterFR, adapterC;
@@ -57,12 +57,13 @@ public class AddContactActivity extends AppCompatActivity {
         firstName = (EditText)findViewById(R.id.firstName);
         lastName = (EditText)findViewById(R.id.lastName);
         phoneNumber = (EditText)findViewById(R.id.phoneNumber);
+        flashRateValue = (EditText)findViewById(R.id.flashRateValue);
 
         PHBridge bridge = phHueSDK.getSelectedBridge();
         allLights = bridge.getResourceCache().getAllLights();
 
         flashPatternList = (Spinner)findViewById(R.id.flashPatternList);
-        flashRateList = (Spinner)findViewById(R.id.flashRateList);
+        //flashRateList = (Spinner)findViewById(R.id.flashRateList);
         colorList = (Spinner)findViewById(R.id.colorList);
 
         defaultSwitch = (Switch)findViewById(R.id.defaultSwitch);
@@ -75,7 +76,7 @@ public class AddContactActivity extends AppCompatActivity {
 
         //adds items to the spinners
         addItemsToFlashPatternList();
-        addItemsToFlashRateList();
+        //addItemsToFlashRateList();
         addItemsToColorList();
 
         //connects the button to the widgets created in xml
@@ -85,7 +86,7 @@ public class AddContactActivity extends AppCompatActivity {
         saveBtn.setOnClickListener(saveBtnOnClickListener);
         defaultSwitch.setOnCheckedChangeListener(defaultSwitchOnCheckedChangeListener);
         notificationSwitch.setOnCheckedChangeListener(notificationSwitchOnCheckedChangeListener);
-        flashPatternList.setOnItemSelectedListener(flashPatternListOnItemSelectedListener);
+        //flashPatternList.setOnItemSelectedListener(flashPatternListOnItemSelectedListener);
         colorList.setOnItemSelectedListener(colorListOnItemSelectedListener);
 
         hueController.saveAllLightStates();
@@ -98,11 +99,11 @@ public class AddContactActivity extends AppCompatActivity {
         flashPatternList.setAdapter(adapterFP);
     }
 
-    public void addItemsToFlashRateList(){
+    /*public void addItemsToFlashRateList(){
         ArrayList<String> choices = myChoices.getFlashRateList();
         adapterFR = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, choices);
         flashRateList.setAdapter(adapterFR);
-    }
+    }*/
 
     public void addItemsToColorList(){
         ArrayList<String> choices = myChoices.getColorList();
@@ -113,11 +114,12 @@ public class AddContactActivity extends AppCompatActivity {
     View.OnClickListener saveBtnOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View arg0) {
+            ACEPattern pattern = ACEPattern.getInstance();
             if (notificationSwitch.isChecked()) {
                 if (!useDefault) {
                     if (flashPatternList.getSelectedItem().equals("--")) {
                         Toast.makeText(AddContactActivity.this, "Please choose a flash pattern.", Toast.LENGTH_SHORT).show();
-                    } else if (flashRateList.getSelectedItem().equals("--")) {
+                    } else if (flashRateValue.getText().toString().equals("")) {
                         Toast.makeText(AddContactActivity.this, "Please choose a flash rate.", Toast.LENGTH_SHORT).show();
                     }else if (colorList.getSelectedItem().equals("--")) {
                         Toast.makeText(AddContactActivity.this, "Please choose a color.", Toast.LENGTH_SHORT).show();
@@ -126,8 +128,12 @@ public class AddContactActivity extends AppCompatActivity {
                         hueController.createNewContact(String.valueOf(firstName.getText()),
                                 String.valueOf(lastName.getText()), String.valueOf(phoneNumber.getText()),
                                 String.valueOf(flashPatternList.getSelectedItem()),
-                                String.valueOf(flashRateList.getSelectedItem()),
+                                String.valueOf(flashRateValue.getText()),
                                 String.valueOf(colorList.getSelectedItem()), true, false);
+
+                        //pattern has been interrupted, stop it
+                        pattern.setPatternInterrupted(true);
+
                         //contact has been saved -- show a toast
                         Context context = getApplicationContext();
                         CharSequence text = "The information for this contact has been saved.";
@@ -145,6 +151,10 @@ public class AddContactActivity extends AppCompatActivity {
                             hueController.getDefaultFlashPattern(),
                             hueController.getDefaultFlashRate(),
                             hueController.getDefaultColor(), true, true);
+
+                    //pattern has been interrupted, stop it
+                    pattern.setPatternInterrupted(true);
+
                     //contact has been saved -- show a toast
                     Context context = getApplicationContext();
                     CharSequence text = "The information for this contact has been saved.";
@@ -211,9 +221,7 @@ public class AddContactActivity extends AppCompatActivity {
                     flashPatternList.setSelection(selected);
                     flashPatternList.setEnabled(false);
 
-                    selected = adapterFR.getPosition(hueController.getDefaultFlashRate());
-                    flashRateList.setSelection(selected);
-                    flashRateList.setEnabled(false);
+                    flashRateValue.setText(hueController.getDefaultFlashRate());
 
                     selected = adapterC.getPosition(hueController.getDefaultColor());
                     colorList.setSelection(selected);
@@ -224,7 +232,7 @@ public class AddContactActivity extends AppCompatActivity {
                 useDefault = false;
 
                 flashPatternList.setEnabled(true);
-                flashRateList.setEnabled(true);
+                flashRateValue.setEnabled(true);
                 colorList.setEnabled(true);
             }
         }
@@ -278,6 +286,8 @@ public class AddContactActivity extends AppCompatActivity {
         PHHueSDK phHueSDK = PHHueSDK.getInstance();
         PHBridge bridge = phHueSDK.getSelectedBridge();
         List<PHLight> allLights = bridge.getResourceCache().getAllLights();
+        ACEColors colors = ACEColors.getInstance();
+        Double[] colorXY = {colors.getColorsList().get("white")[0], colors.getColorsList().get("white")[1]};
         if (!patternName.equals("--")) {
             for (String defaultLight : hueController.getDefaultLights()) {
                 for (PHLight light : allLights) {
@@ -292,37 +302,37 @@ public class AddContactActivity extends AppCompatActivity {
                             pattern.setPatternInterrupted(false);
                             switch (patternName) {
                                 case "None":
-                                    pattern.nonePattern(light, repeat);
+                                    pattern.nonePattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
                                     break;
                                 case "Short On":
-                                    pattern.shortOnPattern(light, repeat);
+                                    pattern.shortOnPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
                                     break;
                                 case "Long On":
-                                    pattern.longOnPattern(light, repeat);
+                                    pattern.longOnPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
                                     break;
                                 case "Color":
-                                    pattern.colorPattern(light, repeat);
+                                    pattern.colorPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
                                     break;
                                 case "Fire":
-                                    pattern.firePattern(light, repeat);
+                                    pattern.firePattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
                                     break;
                                 case "RIT":
-                                    pattern.ritPattern(light, repeat);
+                                    pattern.ritPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
                                     break;
                                 case "Cloudy Sky":
-                                    pattern.cloudySkyPattern(light, repeat);
+                                    pattern.cloudySkyPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
                                     break;
                                 case "Grassy Green":
-                                    pattern.grassyGreenPattern(light, repeat);
+                                    pattern.grassyGreenPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
                                     break;
                                 case "Lavender":
-                                    pattern.lavenderPattern(light, repeat);
+                                    pattern.lavenderPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
                                     break;
                                 case "Bloody Red":
-                                    pattern.bloodyRedPattern(light, repeat);
+                                    pattern.bloodyRedPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
                                     break;
                                 case "Spring Mist":
-                                    pattern.springMistPattern(light, repeat);
+                                    pattern.springMistPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
                                     break;
                             }
                         }

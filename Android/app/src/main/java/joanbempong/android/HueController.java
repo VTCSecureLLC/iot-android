@@ -47,6 +47,8 @@ public class HueController {
     private String brightness;
     private String isOn;
     private String color;
+    private String colorX;
+    private String colorY;
 
     private boolean toggle = false;
     private int totalDuration = 0;
@@ -55,7 +57,8 @@ public class HueController {
     private boolean defaultValues = false;
     private boolean isFlashing = false;
     private boolean newMissedCall = false;
-
+    private boolean onCall = false;
+    private boolean timerForMissedCallExists = false;
 
 
 
@@ -198,6 +201,28 @@ public class HueController {
         this.newMissedCall = b;
     }
 
+    public Boolean getNewMissedCall(){
+        return this.newMissedCall;
+    }
+
+    public void setTimerForMissedCallExists(Boolean b){
+        this.timerForMissedCallExists = b;
+    }
+
+    public Boolean getTimerForMissedCallExists(){
+        return this.timerForMissedCallExists;
+    }
+
+
+
+    public void setOnCall(Boolean b){
+        this.onCall = b;
+    }
+
+    public Boolean getOnCall(){
+        return this.onCall;
+    }
+
     public void setTotalCommands(int i){
         this.totalCommands = i;
     }
@@ -280,34 +305,37 @@ public class HueController {
             }
             if (!getDefaultDuration().equals("Always On (full brightness)")) {
                 final int MAX_DURATION = Integer.parseInt(getDefaultDuration()) * 60;
-
-                (new Thread() {
-                    public void run() {
-                        Timer timer = new Timer();
-                        System.out.println("timer has been created for missed calls");
-                        timer.schedule(new TimerTask() {
-                            @Override
-                            public void run() {
-                                while(newMissedCall) {
-                                    System.out.println("ticking");
-                                    System.out.println(totalDuration);
-                                    System.out.println(MAX_DURATION);
-                                    if (totalDuration == MAX_DURATION) { //10 rings in total
-                                        restoreAllLightStates();
-                                        setNewMissedCall(false);
-                                        cancel();
-                                    } else {
-                                        //wait for a second before repeating
-                                        sleepLength(1000);
-                                        totalDuration++;
+                if (!getTimerForMissedCallExists()) {
+                    (new Thread() {
+                        public void run() {
+                            Timer timer = new Timer();
+                            setTimerForMissedCallExists(true);
+                            System.out.println("timer has been created for missed calls");
+                            timer.schedule(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    while (newMissedCall) {
+                                        System.out.println("ticking");
+                                        System.out.println(totalDuration);
+                                        System.out.println(MAX_DURATION);
+                                        if (totalDuration >= MAX_DURATION) { //10 rings in total
+                                            restoreAllLightStates();
+                                            setNewMissedCall(false);
+                                            setTimerForMissedCallExists(false);
+                                            cancel();
+                                        } else {
+                                            //wait for a second before repeating
+                                            sleepLength(1000);
+                                            totalDuration++;
+                                        }
                                     }
+                                    System.out.println("timer has been cancelled for missed calls");
+                                    cancel();
                                 }
-                                System.out.println("timer has been cancelled for missed calls");
-                                cancel();
-                            }
-                        }, 0, 1000);
-                    }
-                }).start();
+                            }, 0, 1000);
+                        }
+                    }).start();
+                }
             }
         }
         else{
@@ -339,18 +367,21 @@ public class HueController {
             brightness = String.valueOf(light.getLastKnownLightState().getBrightness());
             isOn = String.valueOf(light.getLastKnownLightState().isOn());
             if (light.supportsColor()){
-                color = String.valueOf(light.getLastKnownLightState().getHue());
+                colorX = String.valueOf(light.getLastKnownLightState().getX());
+                colorY = String.valueOf(light.getLastKnownLightState().getY());
             }
             else{
                 color = "null";
             }
             System.out.println(brightness);
             System.out.println(isOn);
-            System.out.println(color);
+            System.out.println(colorX);
+            System.out.println(colorY);
             LightState = new ArrayList<>();
             LightState.add(light.getIdentifier());
             LightState.add(brightness);
-            LightState.add(color);
+            LightState.add(colorX);
+            LightState.add(colorY);
             LightState.add(isOn);
             LightStates.add(LightState);
         }
@@ -369,17 +400,18 @@ public class HueController {
                     PHLightState state = new PHLightState();
                     state.setBrightness(Integer.parseInt(lightState.get(1)));
                     bridge.updateLightState(light, state);
-                    //System.out.println(Integer.parseInt(lightState.get(1)));
                     incrementAndCheck10();
-                    if (!lightState.get(2).equals("null")) {
-                        state.setHue(Integer.parseInt(lightState.get(2)));
+                    if (light.supportsColor()) {
+                        state.setX(Float.valueOf(lightState.get(2)));
                         bridge.updateLightState(light, state);
-                        //System.out.println(Integer.parseInt(lightState.get(2)));
+                        incrementAndCheck10();
+
+                        state.setY(Float.valueOf(lightState.get(3)));
+                        bridge.updateLightState(light, state);
                         incrementAndCheck10();
                     }
-                    state.setOn(Boolean.parseBoolean(lightState.get(3)));
+                    state.setOn(Boolean.parseBoolean(lightState.get(4)));
                     bridge.updateLightState(light, state);
-                    //System.out.println(Boolean.parseBoolean(lightState.get(3)));
                     incrementAndCheck10();
                     break innerLoop;
                 }

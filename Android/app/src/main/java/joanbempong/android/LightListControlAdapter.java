@@ -22,13 +22,6 @@ import java.util.List;
 public class LightListControlAdapter extends BaseAdapter{
     private LayoutInflater mInflater;
     private List<PHLight> allLights;
-    int red = 0;
-    int orange = 6375;
-    int yellow = 12750;
-    int green = 25500;
-    int blue = 46920;
-    int purple = 50100;
-    int pink = 61100;
     private HueController controller;
 
     /**
@@ -80,6 +73,8 @@ public class LightListControlAdapter extends BaseAdapter{
         final Button purpleBtn = (Button)convertView.findViewById(R.id.purpleBtn);
         final Button pinkBtn = (Button)convertView.findViewById(R.id.pinkBtn);
 
+        final ACEColors colors = ACEColors.getInstance();
+
         if (!light.supportsColor()){
             redBtn.setVisibility(View.GONE);
             orangeBtn.setVisibility(View.GONE);
@@ -93,7 +88,9 @@ public class LightListControlAdapter extends BaseAdapter{
         redBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                state.setHue(red);
+                state.setX(Float.valueOf(String.valueOf(colors.getColorsList().get("red")[0])));
+                bridge.updateLightState(light, state);
+                state.setY(Float.valueOf(String.valueOf(colors.getColorsList().get("red")[1])));
                 bridge.updateLightState(light, state);
             }
         });
@@ -101,7 +98,9 @@ public class LightListControlAdapter extends BaseAdapter{
         orangeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                state.setHue(orange);
+                state.setX(Float.valueOf(String.valueOf(colors.getColorsList().get("orange")[0])));
+                bridge.updateLightState(light, state);
+                state.setY(Float.valueOf(String.valueOf(colors.getColorsList().get("orange")[1])));
                 bridge.updateLightState(light, state);
             }
         });
@@ -109,7 +108,9 @@ public class LightListControlAdapter extends BaseAdapter{
         yellowBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                state.setHue(yellow);
+                state.setX(Float.valueOf(String.valueOf(colors.getColorsList().get("yellow")[0])));
+                bridge.updateLightState(light, state);
+                state.setY(Float.valueOf(String.valueOf(colors.getColorsList().get("yellow")[1])));
                 bridge.updateLightState(light, state);
             }
         });
@@ -117,7 +118,9 @@ public class LightListControlAdapter extends BaseAdapter{
         greenBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                state.setHue(green);
+                state.setX(Float.valueOf(String.valueOf(colors.getColorsList().get("green")[0])));
+                bridge.updateLightState(light, state);
+                state.setY(Float.valueOf(String.valueOf(colors.getColorsList().get("green")[1])));
                 bridge.updateLightState(light, state);
             }
         });
@@ -125,7 +128,9 @@ public class LightListControlAdapter extends BaseAdapter{
         blueBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                state.setHue(blue);
+                state.setX(Float.valueOf(String.valueOf(colors.getColorsList().get("blue")[0])));
+                bridge.updateLightState(light, state);
+                state.setY(Float.valueOf(String.valueOf(colors.getColorsList().get("blue")[1])));
                 bridge.updateLightState(light, state);
 
             }
@@ -134,7 +139,9 @@ public class LightListControlAdapter extends BaseAdapter{
         purpleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                state.setHue(purple);
+                state.setX(Float.valueOf(String.valueOf(colors.getColorsList().get("purple")[0])));
+                bridge.updateLightState(light, state);
+                state.setY(Float.valueOf(String.valueOf(colors.getColorsList().get("purple")[1])));
                 bridge.updateLightState(light, state);
             }
         });
@@ -142,7 +149,9 @@ public class LightListControlAdapter extends BaseAdapter{
         pinkBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                state.setHue(pink);
+                state.setX(Float.valueOf(String.valueOf(colors.getColorsList().get("pink")[0])));
+                bridge.updateLightState(light, state);
+                state.setY(Float.valueOf(String.valueOf(colors.getColorsList().get("pink")[1])));
                 bridge.updateLightState(light, state);
             }
         });

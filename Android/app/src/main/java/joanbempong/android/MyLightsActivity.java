@@ -1,8 +1,8 @@
 package joanbempong.android;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +21,7 @@ import com.philips.lighting.model.PHLight;
 import java.util.List;
 import java.util.Map;
 
-public class MyLightsActivity extends AppCompatActivity {
+public class MyLightsActivity extends Activity {
     private PHHueSDK phHueSDK;
     private PHBridge bridge;
     private EditLightAdapter adapter;
