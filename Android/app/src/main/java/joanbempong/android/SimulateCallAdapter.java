@@ -157,28 +157,28 @@ public class SimulateCallAdapter extends BaseAdapter {
                                                     pattern.longOnPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
                                                     break;
                                                 case "Color":
-                                                    pattern.colorPattern(light, repeat, Long.valueOf(contact.getFlashRate()));
+                                                    pattern.colorPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
                                                     break;
                                                 case "Fire":
-                                                    pattern.firePattern(light, repeat, Long.valueOf(contact.getFlashRate()));
+                                                    pattern.firePattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
                                                     break;
                                                 case "RIT":
-                                                    pattern.ritPattern(light, repeat, Long.valueOf(contact.getFlashRate()));
+                                                    pattern.ritPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
                                                     break;
                                                 case "Cloudy Sky":
-                                                    pattern.cloudySkyPattern(light, repeat, Long.valueOf(contact.getFlashRate()));
+                                                    pattern.cloudySkyPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
                                                     break;
                                                 case "Grassy Green":
-                                                    pattern.grassyGreenPattern(light, repeat, Long.valueOf(contact.getFlashRate()));
+                                                    pattern.grassyGreenPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
                                                     break;
                                                 case "Lavender":
-                                                    pattern.lavenderPattern(light, repeat, Long.valueOf(contact.getFlashRate()));
+                                                    pattern.lavenderPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
                                                     break;
                                                 case "Bloody Red":
-                                                    pattern.bloodyRedPattern(light, repeat, Long.valueOf(contact.getFlashRate()));
+                                                    pattern.bloodyRedPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
                                                     break;
                                                 case "Spring Mist":
-                                                    pattern.springMistPattern(light, repeat, Long.valueOf(contact.getFlashRate()));
+                                                    pattern.springMistPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
                                                     break;
                                             }
                                         }

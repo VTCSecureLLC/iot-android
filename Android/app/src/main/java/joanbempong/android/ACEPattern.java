@@ -25,7 +25,7 @@ public class ACEPattern {
     private boolean useThisPattern = false;
     private boolean patternInterrupted = false;
 
-    private ACEPattern(){
+    private ACEPattern() {
         colors.add("red");
         colors.add("orange");
         colors.add("yellow");
@@ -36,7 +36,7 @@ public class ACEPattern {
     }
 
     public static ACEPattern getInstance() {
-        if(instance == null) {
+        if (instance == null) {
             instance = new ACEPattern();
         }
 
@@ -47,23 +47,11 @@ public class ACEPattern {
         return getInstance();
     }
 
-    public Integer getIndex(){
-        return this.index;
-    }
-
     public void setIndex(int i) {
         this.index = i;
     }
 
-    public void incrementIndex() {
-        this.index++;
-    }
-
-    public ArrayList<String> getColors(){
-        return this.colors;
-    }
-
-    public Boolean getPatternToggle(){
+    public Boolean getPatternToggle() {
         return this.nonePatternToggle;
     }
 
@@ -71,11 +59,7 @@ public class ACEPattern {
         this.nonePatternToggle = !this.nonePatternToggle;
     }
 
-    public Boolean getUseThisPattern(){
-        return this.useThisPattern;
-    }
-
-    public Boolean getPatternInterrupted(){
+    public Boolean getPatternInterrupted() {
         return this.patternInterrupted;
     }
 
@@ -87,6 +71,93 @@ public class ACEPattern {
         this.useThisPattern = b;
     }
 
+    public void changeState(PHLight light, Boolean stateOn, Double[] color, long sleep) {
+        PHLightState state = new PHLightState();
+        if (stateOn) {
+            state.setOn(stateOn);
+            bridge.updateLightState(light, state);
+            state.setBrightness(255);
+            bridge.updateLightState(light, state);
+            state.setTransitionTime(8);
+            bridge.updateLightState(light, state);
+            if (light.supportsColor()) {
+                state.setX(Float.valueOf(String.valueOf(color[0])));
+                bridge.updateLightState(light, state);
+                state.setY(Float.valueOf(String.valueOf(color[1])));
+                bridge.updateLightState(light, state);
+            }
+        } else {
+            state.setBrightness(0);
+            bridge.updateLightState(light, state);
+            state.setOn(stateOn);
+            bridge.updateLightState(light, state);
+        }
+        try {
+            Thread.sleep(sleep);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void threadForColorPatterns(final PHLight light, final Boolean repeat, final long sleep,
+                                       final List<Double[]> colorPatternList, final Double[] color ) {
+        (new Thread() {
+            public void run() {
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (repeat) {
+                            int index = 0;
+                            while (useThisPattern && !getPatternInterrupted()) {
+                                Double[] color = colorPatternList.get(index);
+                                changeState(light, true, color, sleep);
+                                index++;
+                                if (index >= colorPatternList.size()) {
+                                    index = 0;
+                                }
+                            }
+                            cancel();
+                            checkCurrentCircumstance(repeat, color);
+                        } else {
+                            int total = 0;
+                            int index = 0;
+                            while ((total < 3) && !getPatternInterrupted()) {
+                                Double[] color = colorPatternList.get(index);
+                                changeState(light, true, color, sleep);
+                                index++;
+                                if (index >= colorPatternList.size()) {
+                                    index = 0;
+                                    total++;
+                                }
+                            }
+                            cancel();
+                            checkCurrentCircumstance(repeat, color);
+                        }
+                    }
+                }, 0, 1000);
+            }
+        }).start();
+    }
+
+    public void checkCurrentCircumstance(Boolean repeat, Double[] color) {
+        if (repeat) {
+            if (hueController.getOnCall()) {
+                System.out.println("a call has been answered");
+                hueController.turnOnOnCallLights();
+            } else if (hueController.getNewMissedCall()) {
+                System.out.println("a call has been missed");
+                hueController.simulateAMissedCall(color);
+            } else {
+                System.out.println("a call has been declined");
+                hueController.restoreAllLightStates();
+            }
+        }
+        else{
+            hueController.restoreAllLightStates();
+        }
+    }
+
     public void nonePattern(final PHLight light, final Boolean repeat, final long sleep, final Double[] color) {
         (new Thread() {
             public void run() {
@@ -96,64 +167,27 @@ public class ACEPattern {
                     public void run() {
                         if (repeat) {
                             while (useThisPattern && !getPatternInterrupted()) {
-                                PHLightState state = new PHLightState();
-                                state.setOn(getPatternToggle());
-                                bridge.updateLightState(light, state);
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()){
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
+                                changeState(light, getPatternToggle(), color, sleep);
                                 setPatternToggle();
                             }
                             cancel();
-                            if(hueController.getOnCall()){
-                                hueController.turnOnOnCallLights();
-                            }
-                            else if(hueController.getNewMissedCall()){
-                                hueController.simulateAMissedCall();
-                            }
-                            else {
-                                hueController.restoreAllLightStates();
-                            }
+                            checkCurrentCircumstance(repeat, color);
                         } else {
                             int total = 0;
                             while ((total < 4) && !getPatternInterrupted()) {
-                                PHLightState state = new PHLightState();
-                                state.setOn(getPatternToggle());
-                                bridge.updateLightState(light, state);
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()){
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
+                                changeState(light, getPatternToggle(), color, sleep);
                                 setPatternToggle();
                                 total++;
                             }
                             cancel();
-                            hueController.restoreAllLightStates();
+                            checkCurrentCircumstance(repeat, color);
                         }
                     }
                 }, 0, 1000);
             }
         }).start();
     }
+
     public void shortOnPattern(final PHLight light, final Boolean repeat, final long sleep, final Double[] color) {
         (new Thread() {
             public void run() {
@@ -163,74 +197,20 @@ public class ACEPattern {
                     public void run() {
                         if (repeat) {
                             while (useThisPattern && !getPatternInterrupted()) {
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()){
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                                state.setBrightness(0);
-                                bridge.updateLightState(light, state);
-                                state.setOn(false);
-                                bridge.updateLightState(light, state);
-                                try {
-                                    Thread.sleep(sleep*3);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
+                                changeState(light, true, color, sleep);
+                                changeState(light, false, color, sleep*3);
                             }
                             cancel();
-                            if(hueController.getOnCall()){
-                                hueController.turnOnOnCallLights();
-                            }
-                            else if(hueController.getNewMissedCall()){
-                                hueController.simulateAMissedCall();
-                            }
-                            else {
-                                hueController.restoreAllLightStates();
-                            }
+                            checkCurrentCircumstance(repeat, color);
                         } else {
                             int total = 0;
                             while ((total < 3) && !getPatternInterrupted()) {
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()){
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                                state.setBrightness(0);
-                                bridge.updateLightState(light, state);
-                                state.setOn(false);
-                                bridge.updateLightState(light, state);
-                                try {
-                                    Thread.sleep(sleep*3);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
+                                changeState(light, true, color, sleep);
+                                changeState(light, false, color, sleep*3);
                                 total++;
                             }
                             cancel();
-                            hueController.restoreAllLightStates();
+                            checkCurrentCircumstance(repeat, color);
                         }
                     }
                 }, 0, 1000);
@@ -246,335 +226,59 @@ public class ACEPattern {
                     public void run() {
                         if (repeat){
                             while (useThisPattern && !getPatternInterrupted()) {
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()){
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                try {
-                                    Thread.sleep(sleep*3);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                                state.setBrightness(0);
-                                bridge.updateLightState(light, state);
-                                state.setOn(false);
-                                bridge.updateLightState(light, state);
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
+                                changeState(light, true, color, sleep*3);
+                                changeState(light, false, color, sleep);
                             }
                             cancel();
-                            if(hueController.getOnCall()){
-                                hueController.turnOnOnCallLights();
-                            }
-                            else if(hueController.getNewMissedCall()){
-                                hueController.simulateAMissedCall();
-                            }
-                            else {
-                                hueController.restoreAllLightStates();
-                            }
+                            checkCurrentCircumstance(repeat, color);
                         }
                         else{
                             int total = 0;
                             while ((total < 3) && !getPatternInterrupted()) {
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()){
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                try {
-                                    Thread.sleep(sleep*3);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                                state.setBrightness(0);
-                                bridge.updateLightState(light, state);
-                                state.setOn(false);
-                                bridge.updateLightState(light, state);
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
+                                changeState(light, true, color, sleep*3);
+                                changeState(light, false, color, sleep);
                                 total++;
                             }
                             cancel();
-                            hueController.restoreAllLightStates();
+                            checkCurrentCircumstance(repeat, color);
                         }
                     }
                 }, 0, 1000);
             }
         }).start();
     }
-    public void colorPattern(final PHLight light, final Boolean repeat, final long sleep){
+    public void colorPattern(final PHLight light, final Boolean repeat, final long sleep, final Double[] color){
         ACEColors colors = ACEColors.getInstance();
         Map colorsList = colors.getColorsList();
         final List<Double[]> colorPatternList = new ArrayList<>();
         colorPatternList.add((Double[]) colorsList.get("red"));
         colorPatternList.add((Double[]) colorsList.get("orange"));
-        colorPatternList.add((Double[]) colorsList.get("yellow"));
+        colorPatternList.add((Double[]) colorsList.get("gold"));
         colorPatternList.add((Double[]) colorsList.get("green"));
-        colorPatternList.add((Double[]) colorsList.get("blue"));
+        colorPatternList.add((Double[]) colorsList.get("deepSkyBlue"));
         colorPatternList.add((Double[]) colorsList.get("purple"));
         colorPatternList.add((Double[]) colorsList.get("pink"));
-        (new Thread() {
-            public void run() {
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (repeat) {
-                            int index = 0;
-                            while (useThisPattern && !getPatternInterrupted()) {
-                                Double[] color = colorPatternList.get(index);
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()) {
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                index++;
-                                if (index >= colorPatternList.size()) {
-                                    index = 0;
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            cancel();
-                            if(hueController.getOnCall()){
-                                hueController.turnOnOnCallLights();
-                            }
-                            else if(hueController.getNewMissedCall()){
-                                hueController.simulateAMissedCall();
-                            }
-                            else {
-                                hueController.restoreAllLightStates();
-                            }
-                        } else {
-                            int total = 0;
-                            int index = 0;
-                            while ((total < 3) && !getPatternInterrupted()) {
-                                Double[] color = colorPatternList.get(index);
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()) {
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                index++;
-                                if (index >= colorPatternList.size()) {
-                                    index = 0;
-                                    total++;
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            cancel();
-                            hueController.restoreAllLightStates();
-                        }
-                    }
-                }, 0, 1000);
-            }
-        }).start();
+        threadForColorPatterns(light, repeat, sleep, colorPatternList, color);
     }
-    public void firePattern(final PHLight light, final Boolean repeat, final long sleep){
+    public void firePattern(final PHLight light, final Boolean repeat, final long sleep, final Double[] color){
         ACEColors colors = ACEColors.getInstance();
         Map colorsList = colors.getColorsList();
         final List<Double[]> colorPatternList = new ArrayList<>();
         colorPatternList.add((Double[]) colorsList.get("red"));
         colorPatternList.add((Double[]) colorsList.get("orange"));
         colorPatternList.add((Double[]) colorsList.get("yellow"));
-        (new Thread() {
-            public void run() {
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (repeat) {
-                            int index = 0;
-                            while (useThisPattern && !getPatternInterrupted()) {
-                                Double[] color = colorPatternList.get(index);
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                if (light.supportsColor()) {
-                                    bridge.updateLightState(light, state);
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                index++;
-                                if (index >= colorPatternList.size()) {
-                                    index = 0;
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            cancel();
-                            if(hueController.getOnCall()){
-                                hueController.turnOnOnCallLights();
-                            }
-                            else if(hueController.getNewMissedCall()){
-                                hueController.simulateAMissedCall();
-                            }
-                            else {
-                                hueController.restoreAllLightStates();
-                            }
-                        } else {
-                            int total = 0;
-                            int index = 0;
-                            while ((total < 3) && !getPatternInterrupted()) {
-                                Double[] color = colorPatternList.get(index);
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()) {
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                index++;
-                                if (index >= colorPatternList.size()) {
-                                    index = 0;
-                                    total++;
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            cancel();
-                            hueController.restoreAllLightStates();
-                        }
-                    }
-                }, 0, 1000);
-            }
-        }).start();
+        threadForColorPatterns(light, repeat, sleep, colorPatternList, color);
     }
-    public void ritPattern(final PHLight light, final Boolean repeat, final long sleep){
+    public void ritPattern(final PHLight light, final Boolean repeat, final long sleep, final Double[] color){
         ACEColors colors = ACEColors.getInstance();
         Map colorsList = colors.getColorsList();
         final List<Double[]> colorPatternList = new ArrayList<>();
         colorPatternList.add((Double[]) colorsList.get("black"));
         colorPatternList.add((Double[]) colorsList.get("orange"));
         colorPatternList.add((Double[]) colorsList.get("brown"));
-        (new Thread() {
-            public void run() {
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (repeat) {
-                            int index = 0;
-                            while (useThisPattern && !getPatternInterrupted()) {
-                                Double[] color = colorPatternList.get(index);
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()) {
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                index++;
-                                if (index >= colorPatternList.size()) {
-                                    index = 0;
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            cancel();
-                            if(hueController.getOnCall()){
-                                hueController.turnOnOnCallLights();
-                            }
-                            else if(hueController.getNewMissedCall()){
-                                hueController.simulateAMissedCall();
-                            }
-                            else {
-                                hueController.restoreAllLightStates();
-                            }
-                        } else {
-                            int total = 0;
-                            int index = 0;
-                            while ((total < 3) && !getPatternInterrupted()) {
-                                Double[] color = colorPatternList.get(index);
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()) {
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                index++;
-                                if (index >= colorPatternList.size()) {
-                                    index = 0;
-                                    total++;
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            cancel();
-                            hueController.restoreAllLightStates();
-                        }
-                    }
-                }, 0, 1000);
-            }
-        }).start();
+        threadForColorPatterns(light, repeat, sleep, colorPatternList, color);
     }
-    public void cloudySkyPattern(final PHLight light, final Boolean repeat, final long sleep){
+    public void cloudySkyPattern(final PHLight light, final Boolean repeat, final long sleep, final Double[] color){
         ACEColors colors = ACEColors.getInstance();
         Map colorsList = colors.getColorsList();
         final List<Double[]> colorPatternList = new ArrayList<>();
@@ -582,83 +286,9 @@ public class ACEPattern {
         colorPatternList.add((Double[]) colorsList.get("white"));
         colorPatternList.add((Double[]) colorsList.get("deepSkyBlue"));
         colorPatternList.add((Double[]) colorsList.get("skyBlue"));
-        (new Thread() {
-            public void run() {
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (repeat) {
-                            int index = 0;
-                            while (useThisPattern && !getPatternInterrupted()) {
-                                Double[] color = colorPatternList.get(index);
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()) {
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                index++;
-                                if (index >= colorPatternList.size()) {
-                                    index = 0;
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            cancel();
-                            if(hueController.getOnCall()){
-                                hueController.turnOnOnCallLights();
-                            }
-                            else if(hueController.getNewMissedCall()){
-                                hueController.simulateAMissedCall();
-                            }
-                            else {
-                                hueController.restoreAllLightStates();
-                            }
-                        } else {
-                            int total = 0;
-                            int index = 0;
-                            while ((total < 3) && !getPatternInterrupted()) {
-                                Double[] color = colorPatternList.get(index);
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()) {
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                index++;
-                                if (index >= colorPatternList.size()) {
-                                    index = 0;
-                                    total++;
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            cancel();
-                            hueController.restoreAllLightStates();
-                        }
-                    }
-                }, 0, 1000);
-            }
-        }).start();
+        threadForColorPatterns(light, repeat, sleep, colorPatternList, color);
     }
-    public void grassyGreenPattern(final PHLight light, final Boolean repeat, final long sleep){
+    public void grassyGreenPattern(final PHLight light, final Boolean repeat, final long sleep, final Double[] color){
         ACEColors colors = ACEColors.getInstance();
         Map colorsList = colors.getColorsList();
         final List<Double[]> colorPatternList = new ArrayList<>();
@@ -667,166 +297,18 @@ public class ACEPattern {
         colorPatternList.add((Double[]) colorsList.get("seaGreen"));
         colorPatternList.add((Double[]) colorsList.get("lightGreen"));
         colorPatternList.add((Double[]) colorsList.get("springGreen"));
-        (new Thread() {
-            public void run() {
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (repeat) {
-                            int index = 0;
-                            while (useThisPattern && !getPatternInterrupted()) {
-                                Double[] color = colorPatternList.get(index);
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()) {
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                index++;
-                                if (index >= colorPatternList.size()) {
-                                    index = 0;
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            cancel();
-                            if(hueController.getOnCall()){
-                                hueController.turnOnOnCallLights();
-                            }
-                            else if(hueController.getNewMissedCall()){
-                                hueController.simulateAMissedCall();
-                            }
-                            else {
-                                hueController.restoreAllLightStates();
-                            }
-                        } else {
-                            int total = 0;
-                            int index = 0;
-                            while ((total < 3) && !getPatternInterrupted()) {
-                                Double[] color = colorPatternList.get(index);
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()) {
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                index++;
-                                if (index >= colorPatternList.size()) {
-                                    index = 0;
-                                    total++;
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            cancel();
-                            hueController.restoreAllLightStates();
-                        }
-                    }
-                }, 0, 1000);
-            }
-        }).start();
+        threadForColorPatterns(light, repeat, sleep, colorPatternList, color);
     }
-    public void lavenderPattern(final PHLight light, final Boolean repeat, final long sleep){
+    public void lavenderPattern(final PHLight light, final Boolean repeat, final long sleep, final Double[] color){
         ACEColors colors = ACEColors.getInstance();
         Map colorsList = colors.getColorsList();
         final List<Double[]> colorPatternList = new ArrayList<>();
         colorPatternList.add((Double[]) colorsList.get("purple"));
         colorPatternList.add((Double[]) colorsList.get("lavender"));
         colorPatternList.add((Double[]) colorsList.get("plum"));
-        (new Thread() {
-            public void run() {
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (repeat) {
-                            int index = 0;
-                            while (useThisPattern && !getPatternInterrupted()) {
-                                Double[] color = colorPatternList.get(index);
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()) {
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                index++;
-                                if (index >= colorPatternList.size()) {
-                                    index = 0;
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            cancel();
-                            if(hueController.getOnCall()){
-                                hueController.turnOnOnCallLights();
-                            }
-                            else if(hueController.getNewMissedCall()){
-                                hueController.simulateAMissedCall();
-                            }
-                            else {
-                                hueController.restoreAllLightStates();
-                            }
-                        } else {
-                            int total = 0;
-                            int index = 0;
-                            while ((total < 3) && !getPatternInterrupted()) {
-                                Double[] color = colorPatternList.get(index);
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()) {
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                index++;
-                                if (index >= colorPatternList.size()) {
-                                    index = 0;
-                                    total++;
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            cancel();
-                            hueController.restoreAllLightStates();
-                        }
-                    }
-                }, 0, 1000);
-            }
-        }).start();
+        threadForColorPatterns(light, repeat, sleep, colorPatternList, color);
     }
-    public void bloodyRedPattern(final PHLight light, final Boolean repeat, final long sleep){
+    public void bloodyRedPattern(final PHLight light, final Boolean repeat, final long sleep, final Double[] color){
         ACEColors colors = ACEColors.getInstance();
         Map colorsList = colors.getColorsList();
         final List<Double[]> colorPatternList = new ArrayList<>();
@@ -834,83 +316,9 @@ public class ACEPattern {
         colorPatternList.add((Double[]) colorsList.get("crimson"));
         colorPatternList.add((Double[]) colorsList.get("darkRed"));
         colorPatternList.add((Double[]) colorsList.get("fireBrick"));
-        (new Thread() {
-            public void run() {
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (repeat) {
-                            int index = 0;
-                            while (useThisPattern && !getPatternInterrupted()) {
-                                Double[] color = colorPatternList.get(index);
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()) {
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                index++;
-                                if (index >= colorPatternList.size()) {
-                                    index = 0;
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            cancel();
-                            if(hueController.getOnCall()){
-                                hueController.turnOnOnCallLights();
-                            }
-                            else if(hueController.getNewMissedCall()){
-                                hueController.simulateAMissedCall();
-                            }
-                            else {
-                                hueController.restoreAllLightStates();
-                            }
-                        } else {
-                            int total = 0;
-                            int index = 0;
-                            while ((total < 3) && !getPatternInterrupted()) {
-                                Double[] color = colorPatternList.get(index);
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()) {
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                index++;
-                                if (index >= colorPatternList.size()) {
-                                    index = 0;
-                                    total++;
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            cancel();
-                            hueController.restoreAllLightStates();
-                        }
-                    }
-                }, 0, 1000);
-            }
-        }).start();
+        threadForColorPatterns(light, repeat, sleep, colorPatternList, color);
     }
-    public void springMistPattern(final PHLight light, final Boolean repeat, final long sleep){
+    public void springMistPattern(final PHLight light, final Boolean repeat, final long sleep, final Double[] color){
         ACEColors colors = ACEColors.getInstance();
         Map colorsList = colors.getColorsList();
         final List<Double[]> colorPatternList = new ArrayList<>();
@@ -918,81 +326,6 @@ public class ACEPattern {
         colorPatternList.add((Double[]) colorsList.get("lightGreen"));
         colorPatternList.add((Double[]) colorsList.get("orange"));
         colorPatternList.add((Double[]) colorsList.get("lightPink"));
-        (new Thread() {
-            public void run() {
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (repeat) {
-                            int index = 0;
-                            while (useThisPattern && !getPatternInterrupted()) {
-                                Double[] color = colorPatternList.get(index);
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()) {
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                index++;
-                                if (index >= colorPatternList.size()) {
-                                    index = 0;
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            cancel();
-                            if(hueController.getOnCall()){
-                                hueController.turnOnOnCallLights();
-                            }
-                            else if(hueController.getNewMissedCall()){
-                                hueController.simulateAMissedCall();
-                            }
-                            else {
-                                hueController.restoreAllLightStates();
-                            }
-                        } else {
-                            int total = 0;
-                            int index = 0;
-                            while ((total < 3) && !getPatternInterrupted()) {
-                                Double[] color = colorPatternList.get(index);
-                                PHLightState state = new PHLightState();
-                                state.setOn(true);
-                                bridge.updateLightState(light, state);
-                                if (light.supportsColor()) {
-                                    state.setX(Float.valueOf(String.valueOf(color[0])));
-                                    bridge.updateLightState(light, state);
-                                    state.setY(Float.valueOf(String.valueOf(color[1])));
-                                    bridge.updateLightState(light, state);
-                                }
-                                state.setBrightness(255);
-                                bridge.updateLightState(light, state);
-                                index++;
-                                if (index >= colorPatternList.size()) {
-                                    index = 0;
-                                    total++;
-                                }
-                                try {
-                                    Thread.sleep(sleep);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            cancel();
-                            hueController.restoreAllLightStates();
-
-                        }
-                    }
-                }, 0, 1000);
-            }
-        }).start();
+        threadForColorPatterns(light, repeat, sleep, colorPatternList, color);
     }
 }

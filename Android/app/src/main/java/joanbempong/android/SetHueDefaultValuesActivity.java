@@ -215,28 +215,28 @@ public class SetHueDefaultValuesActivity extends Activity {
                                     pattern.longOnPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
                                     break;
                                 case "Color":
-                                    pattern.colorPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
+                                    pattern.colorPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
                                     break;
                                 case "Fire":
-                                    pattern.firePattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
+                                    pattern.firePattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
                                     break;
                                 case "RIT":
-                                    pattern.ritPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
+                                    pattern.ritPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
                                     break;
                                 case "Cloudy Sky":
-                                    pattern.cloudySkyPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
+                                    pattern.cloudySkyPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
                                     break;
                                 case "Grassy Green":
-                                    pattern.grassyGreenPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
+                                    pattern.grassyGreenPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
                                     break;
                                 case "Lavender":
-                                    pattern.lavenderPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
+                                    pattern.lavenderPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
                                     break;
                                 case "Bloody Red":
-                                    pattern.bloodyRedPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
+                                    pattern.bloodyRedPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
                                     break;
                                 case "Spring Mist":
-                                    pattern.springMistPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())));
+                                    pattern.springMistPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
                                     break;
                             }
                         }

@@ -279,7 +279,7 @@ public class HueController {
         }
     }
 
-    public void simulateAMissedCall() {
+    public void simulateAMissedCall(Double[] color) {
         totalCommands = 0;
         PHHueSDK phHueSDK;
         phHueSDK = PHHueSDK.getInstance();
@@ -299,6 +299,12 @@ public class HueController {
                         newState.setBrightness(255);
                         bridge.updateLightState(light, newState);
                         incrementAndCheck10();
+                        if (light.supportsColor()){
+                            newState.setX(Float.valueOf(String.valueOf(color[0])));
+                            bridge.updateLightState(light, newState);
+                            newState.setY(Float.valueOf(String.valueOf(color[1])));
+                            bridge.updateLightState(light, newState);
+                        }
                         break innerLoop;
                     }
                 }
@@ -350,6 +356,12 @@ public class HueController {
                         newState.setBrightness(25);
                         bridge.updateLightState(light, newState);
                         incrementAndCheck10();
+                        if (light.supportsColor()){
+                            newState.setX(Float.valueOf(String.valueOf(color[0])));
+                            bridge.updateLightState(light, newState);
+                            newState.setY(Float.valueOf(String.valueOf(color[1])));
+                            bridge.updateLightState(light, newState);
+                        }
                         break innerLoop;
                     }
                 }
@@ -495,11 +507,11 @@ public class HueController {
 
     public void incrementAndCheck10(){
         totalCommands++;
-        System.out.println("total commands: " + totalCommands);
+        //System.out.println("total commands: " + totalCommands);
         if (totalCommands >= 10){
             //cannot exceed 10 commands per second
             //wait for a bit
-            System.out.println(totalCommands + " >= 10");
+            //System.out.println(totalCommands + " >= 10");
             sleepLength(1500);
             totalCommands = 0;
         }
