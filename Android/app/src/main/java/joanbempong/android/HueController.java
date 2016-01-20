@@ -19,7 +19,7 @@ public class HueController {
     private static HueController instance = null;
 
     //default values for incoming and missed calls
-    private List<String> defaultLights = new ArrayList<>();
+    private List<String> defaultLights = new ArrayList<String>();
     private String defaultDuration, defaultFlashPattern, defaultFlashRate, defaultColor;
 
     //old default values for incoming and missed calls
@@ -28,7 +28,7 @@ public class HueController {
 
 
     //Current contact list
-    private ArrayList<ACEContact> Contacts = new ArrayList<>();
+    private ArrayList<ACEContact> Contacts = new ArrayList<ACEContact>();
 
     //old contact information
     private String oldContactFirstName;
@@ -42,7 +42,7 @@ public class HueController {
 
 
     //current light states
-    private List<List<String>> LightStates = new ArrayList<>();
+    private List<List<String>> LightStates = new ArrayList<List<String>>();
     private List<String> LightState;
     private String brightness;
     private String isOn;
@@ -185,7 +185,7 @@ public class HueController {
     }
 
     public void setCleanDefaultLights(){
-        defaultLights = new ArrayList<>();
+        defaultLights = new ArrayList<String>();
     }
 
    //save current default values
@@ -371,7 +371,7 @@ public class HueController {
 
     public void saveAllLightStates(){
         System.out.println("saving all light states");
-        LightStates = new ArrayList<>();
+        LightStates = new ArrayList<List<String>>();
         PHHueSDK phHueSDK = PHHueSDK.getInstance();
         PHBridge bridge = phHueSDK.getSelectedBridge();
         List<PHLight> allLights = bridge.getResourceCache().getAllLights();
@@ -389,7 +389,7 @@ public class HueController {
             System.out.println(isOn);
             System.out.println(colorX);
             System.out.println(colorY);
-            LightState = new ArrayList<>();
+            LightState = new ArrayList<String>();
             LightState.add(light.getIdentifier());
             LightState.add(brightness);
             LightState.add(colorX);

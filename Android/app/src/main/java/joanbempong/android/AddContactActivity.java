@@ -95,19 +95,19 @@ public class AddContactActivity extends AppCompatActivity {
 
     public void addItemsToFlashPatternList(){
         ArrayList<String> choices = myChoices.getFlashPatternList();
-        adapterFP = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, choices);
+        adapterFP = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, choices);
         flashPatternList.setAdapter(adapterFP);
     }
 
     /*public void addItemsToFlashRateList(){
         ArrayList<String> choices = myChoices.getFlashRateList();
-        adapterFR = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, choices);
+        adapterFR = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, choices);
         flashRateList.setAdapter(adapterFR);
     }*/
 
     public void addItemsToColorList(){
         ArrayList<String> choices = myChoices.getColorList();
-        adapterC = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, choices);
+        adapterC = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, choices);
         colorList.setAdapter(adapterC);
     }
 

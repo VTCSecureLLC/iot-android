@@ -82,7 +82,7 @@ public class SetHueDefaultValuesActivity extends Activity {
 
     public void addItemsToDurationList(){
         ArrayList<String> choices = myChoices.getDurationList();
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, choices);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, choices);
         durationList.setAdapter(adapter);
 
         //set the current selected item
@@ -92,7 +92,7 @@ public class SetHueDefaultValuesActivity extends Activity {
 
     public void addItemsToFlashPatternList(){
         ArrayList<String> choices = myChoices.getFlashPatternList();
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, choices);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, choices);
         flashPatternList.setAdapter(adapter);
 
         //set the current selected item
@@ -102,7 +102,7 @@ public class SetHueDefaultValuesActivity extends Activity {
 
     /*public void addItemsToFlashRateList(){
         ArrayList<String> choices = myChoices.getFlashRateList();
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, choices);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, choices);
         flashRateList.setAdapter(adapter);
 
         //set the current selected item
@@ -112,7 +112,7 @@ public class SetHueDefaultValuesActivity extends Activity {
 
     public void addItemsToColorList(){
         ArrayList<String> choices = myChoices.getColorList();
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, choices);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, choices);
         colorList.setAdapter(adapter);
 
         //set the current selected item

@@ -83,25 +83,25 @@ public class HueDefaultValuesActivity extends Activity {
 
     public void addItemsToDurationList(){
         ArrayList<String> choices = myChoices.getDurationList();
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, choices);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, choices);
         durationList.setAdapter(adapter);
     }
 
     public void addItemsToFlashPatternList(){
         ArrayList<String> choices = myChoices.getFlashPatternList();
-        adapterFP = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, choices);
+        adapterFP = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, choices);
         flashPatternList.setAdapter(adapterFP);
     }
 
     /*public void addItemsToFlashRateList(){
         ArrayList<String> choices = myChoices.getFlashRateList();
-        adapterFR = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, choices);
+        adapterFR = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, choices);
         flashRateList.setAdapter(adapterFR);
     }*/
 
     public void addItemsToColorList(){
         ArrayList<String> choices = myChoices.getColorList();
-        adapterC = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, choices);
+        adapterC = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, choices);
         colorList.setAdapter(adapterC);
     }
 
@@ -210,42 +210,41 @@ public class HueDefaultValuesActivity extends Activity {
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            pattern.setPatternInterrupted(false);
-                            switch (patternName) {
-                                case "None":
+                                pattern.setPatternInterrupted(false);
+                                if (patternName.equals("None")){
                                     pattern.nonePattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "Short On":
+                                }
+                                if (patternName.equals("Short On")){
                                     pattern.shortOnPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "Long On":
+                                }
+                                if (patternName.equals("Long On")){
                                     pattern.longOnPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "Color":
+                                }
+
+                                if (patternName.equals("Color")){
                                     pattern.colorPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "Fire":
+                                }
+                                if (patternName.equals("Fire")){
                                     pattern.firePattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "RIT":
+                                }
+                                if (patternName.equals("RIT")){
                                     pattern.ritPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "Cloudy Sky":
+                                }
+                                if (patternName.equals("Cloudy Sky")){
                                     pattern.cloudySkyPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "Grassy Green":
+                                }
+                                if (patternName.equals( "Grassy Green")){
                                     pattern.grassyGreenPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "Lavender":
+                                }
+                                if (patternName.equals("Lavender")){
                                     pattern.lavenderPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "Bloody Red":
+                                }
+                                if (patternName.equals("Bloody Red")){
                                     pattern.bloodyRedPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "Spring Mist":
+                                }
+                                if (patternName.equals("Spring Mist")){
                                     pattern.springMistPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                            }
+                                }
                         }
                     }
                 }

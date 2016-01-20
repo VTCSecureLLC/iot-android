@@ -20,7 +20,7 @@ public class ACEPattern {
     private PHHueSDK phHueSDK = PHHueSDK.getInstance();
     private PHBridge bridge = phHueSDK.getSelectedBridge();
     private HueController hueController = HueController.getInstance();
-    private ArrayList<String> colors = new ArrayList<>();
+    private ArrayList<String> colors = new ArrayList<String>();
     private boolean nonePatternToggle = false;
     private boolean useThisPattern = false;
     private boolean patternInterrupted = false;
@@ -250,7 +250,7 @@ public class ACEPattern {
     public void colorPattern(final PHLight light, final Boolean repeat, final long sleep, final Double[] color){
         ACEColors colors = ACEColors.getInstance();
         Map colorsList = colors.getColorsList();
-        final List<Double[]> colorPatternList = new ArrayList<>();
+        final List<Double[]> colorPatternList = new ArrayList<Double[]>();
         colorPatternList.add((Double[]) colorsList.get("red"));
         colorPatternList.add((Double[]) colorsList.get("orange"));
         colorPatternList.add((Double[]) colorsList.get("gold"));
@@ -263,7 +263,7 @@ public class ACEPattern {
     public void firePattern(final PHLight light, final Boolean repeat, final long sleep, final Double[] color){
         ACEColors colors = ACEColors.getInstance();
         Map colorsList = colors.getColorsList();
-        final List<Double[]> colorPatternList = new ArrayList<>();
+        final List<Double[]> colorPatternList = new ArrayList<Double[]>();
         colorPatternList.add((Double[]) colorsList.get("red"));
         colorPatternList.add((Double[]) colorsList.get("orange"));
         colorPatternList.add((Double[]) colorsList.get("yellow"));
@@ -272,7 +272,7 @@ public class ACEPattern {
     public void ritPattern(final PHLight light, final Boolean repeat, final long sleep, final Double[] color){
         ACEColors colors = ACEColors.getInstance();
         Map colorsList = colors.getColorsList();
-        final List<Double[]> colorPatternList = new ArrayList<>();
+        final List<Double[]> colorPatternList = new ArrayList<Double[]>();
         colorPatternList.add((Double[]) colorsList.get("black"));
         colorPatternList.add((Double[]) colorsList.get("orange"));
         colorPatternList.add((Double[]) colorsList.get("brown"));
@@ -281,7 +281,7 @@ public class ACEPattern {
     public void cloudySkyPattern(final PHLight light, final Boolean repeat, final long sleep, final Double[] color){
         ACEColors colors = ACEColors.getInstance();
         Map colorsList = colors.getColorsList();
-        final List<Double[]> colorPatternList = new ArrayList<>();
+        final List<Double[]> colorPatternList = new ArrayList<Double[]>();
         colorPatternList.add((Double[]) colorsList.get("blue"));
         colorPatternList.add((Double[]) colorsList.get("white"));
         colorPatternList.add((Double[]) colorsList.get("deepSkyBlue"));
@@ -291,7 +291,7 @@ public class ACEPattern {
     public void grassyGreenPattern(final PHLight light, final Boolean repeat, final long sleep, final Double[] color){
         ACEColors colors = ACEColors.getInstance();
         Map colorsList = colors.getColorsList();
-        final List<Double[]> colorPatternList = new ArrayList<>();
+        final List<Double[]> colorPatternList = new ArrayList<Double[]>();
         colorPatternList.add((Double[]) colorsList.get("green"));
         colorPatternList.add((Double[]) colorsList.get("darkOliveGreen"));
         colorPatternList.add((Double[]) colorsList.get("seaGreen"));
@@ -302,7 +302,7 @@ public class ACEPattern {
     public void lavenderPattern(final PHLight light, final Boolean repeat, final long sleep, final Double[] color){
         ACEColors colors = ACEColors.getInstance();
         Map colorsList = colors.getColorsList();
-        final List<Double[]> colorPatternList = new ArrayList<>();
+        final List<Double[]> colorPatternList = new ArrayList<Double[]>();
         colorPatternList.add((Double[]) colorsList.get("purple"));
         colorPatternList.add((Double[]) colorsList.get("lavender"));
         colorPatternList.add((Double[]) colorsList.get("plum"));
@@ -311,7 +311,7 @@ public class ACEPattern {
     public void bloodyRedPattern(final PHLight light, final Boolean repeat, final long sleep, final Double[] color){
         ACEColors colors = ACEColors.getInstance();
         Map colorsList = colors.getColorsList();
-        final List<Double[]> colorPatternList = new ArrayList<>();
+        final List<Double[]> colorPatternList = new ArrayList<Double[]>();
         colorPatternList.add((Double[]) colorsList.get("red"));
         colorPatternList.add((Double[]) colorsList.get("crimson"));
         colorPatternList.add((Double[]) colorsList.get("darkRed"));
@@ -321,7 +321,7 @@ public class ACEPattern {
     public void springMistPattern(final PHLight light, final Boolean repeat, final long sleep, final Double[] color){
         ACEColors colors = ACEColors.getInstance();
         Map colorsList = colors.getColorsList();
-        final List<Double[]> colorPatternList = new ArrayList<>();
+        final List<Double[]> colorPatternList = new ArrayList<Double[]>();
         colorPatternList.add((Double[]) colorsList.get("aqua"));
         colorPatternList.add((Double[]) colorsList.get("lightGreen"));
         colorPatternList.add((Double[]) colorsList.get("orange"));

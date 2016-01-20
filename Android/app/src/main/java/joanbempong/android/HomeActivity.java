@@ -38,7 +38,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
             //list all the stored contacts
-            stringArray = new ArrayList<>();
+            stringArray = new ArrayList<String>();
 
             if (hueController.getContactList().size() != 0) {
                 for (ACEContact contact : hueController.getContactList()) {

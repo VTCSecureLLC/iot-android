@@ -5,17 +5,17 @@
         android:id="@+id/action_home"
         android:orderInCategory="100"
         android:title="Home"
-        app:showAsAction="never" />
+        tools:showAsAction="never" />
 
     <item
         android:id="@+id/action_lights"
         android:orderInCategory="100"
         android:title="Lights"
-        app:showAsAction="never" />
+        tools:showAsAction="never" />
 
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="Settings"
-        app:showAsAction="never" />
+        tools:showAsAction="never" />
 </menu>

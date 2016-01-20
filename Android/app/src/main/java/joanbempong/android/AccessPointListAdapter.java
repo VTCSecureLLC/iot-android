@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+
 import com.philips.lighting.hue.sdk.PHAccessPoint;
 
 import java.util.List;

@@ -8,10 +8,10 @@ import java.util.ArrayList;
 public class MyChoices {
     //declaring variables
     private static MyChoices instance = null;
-    private ArrayList<String> durationList = new ArrayList<>();
-    private ArrayList<String> flashPatternList = new ArrayList<>();
-    private ArrayList<String> flashRateList = new ArrayList<>();
-    private ArrayList<String> colorList = new ArrayList<>();
+    private ArrayList<String> durationList = new ArrayList<String>();
+    private ArrayList<String> flashPatternList = new ArrayList<String>();
+    private ArrayList<String> flashRateList = new ArrayList<String>();
+    private ArrayList<String> colorList = new ArrayList<String>();
 
     private MyChoices() {
         durationList.add("--");
