@@ -1,5 +1,6 @@
 package joanbempong.android;
 
+import org.linphone.R;
 /**
  * Created by Joan Bempong on 10/7/2015.
  */

@@ -1,5 +1,6 @@
 package joanbempong.android;
 
+import org.linphone.R;
 import java.util.HashMap;
 import java.util.Map;
 

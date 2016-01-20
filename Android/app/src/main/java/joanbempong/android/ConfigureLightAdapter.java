@@ -1,5 +1,6 @@
 package joanbempong.android;
 
+import org.linphone.R;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;

@@ -1,5 +1,6 @@
 package joanbempong.android;
 
+import org.linphone.R;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;

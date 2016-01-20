@@ -1,5 +1,6 @@
 package joanbempong.android;
 
+import org.linphone.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;

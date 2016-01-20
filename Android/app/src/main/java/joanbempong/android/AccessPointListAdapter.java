@@ -1,5 +1,6 @@
 package joanbempong.android;
 
+import org.linphone.R;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;

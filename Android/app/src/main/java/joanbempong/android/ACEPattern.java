@@ -1,5 +1,6 @@
 package joanbempong.android;
 
+import org.linphone.R;
 import com.philips.lighting.hue.sdk.PHHueSDK;
 import com.philips.lighting.model.PHBridge;
 import com.philips.lighting.model.PHLight;
