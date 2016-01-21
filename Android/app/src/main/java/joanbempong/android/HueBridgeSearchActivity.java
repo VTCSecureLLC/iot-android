@@ -1,7 +1,10 @@
 package joanbempong.android;
 
+import org.linphone.LinphoneActivity;
 import org.linphone.R;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -190,7 +193,21 @@ public class HueBridgeSearchActivity extends Activity implements OnItemClickList
                     HueBridgeSearchActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            PHWizardAlertDialog.showErrorDialog(HueBridgeSearchActivity.this, message, R.string.btn_ok);
+                          //  PHWizardAlertDialog.showErrorDialog(HueBridgeSearchActivity.this, message, R.string.btn_ok);
+                            final AlertDialog.Builder alert = new AlertDialog.Builder(HueBridgeSearchActivity.this);
+                            alert.setTitle("Hue");
+                            alert.setMessage(message);
+                            alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+
+                                            startActivity(new Intent(HueBridgeSearchActivity.this, LinphoneActivity.class));
+                                        }
+
+                                    }
+                            );
+                            alert.create();
+                            alert.show();
                         }
                     });
                 }

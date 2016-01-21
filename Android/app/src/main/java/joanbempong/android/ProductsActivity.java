@@ -1,5 +1,6 @@
 package joanbempong.android;
 
+
 import org.linphone.R;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -10,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import org.linphone.LinphoneActivity;
 
 public class ProductsActivity extends Activity {
 
@@ -80,8 +82,12 @@ public class ProductsActivity extends Activity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
 
+                        startActivity(new Intent( ProductsActivity.this, LinphoneActivity.class));
+
+                    }
+
                 }
-            });
+            );
             alert.create();
             alert.show();
         }
@@ -97,6 +103,7 @@ public class ProductsActivity extends Activity {
             alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    startActivity(new Intent( ProductsActivity.this, LinphoneActivity.class));
                 }
             });
             alert.create();
