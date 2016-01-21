@@ -147,42 +147,41 @@ public class SimulateCallAdapter extends BaseAdapter {
                                             boolean repeat = true;
                                             pattern.setUseThisPattern(true);
                                             pattern.setPatternInterrupted(false);
-                                            switch (flashPattern) {
-                                                case "None":
-                                                    pattern.nonePattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
-                                                    break;
-                                                case "Short On":
-                                                    pattern.shortOnPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
-                                                    break;
-                                                case "Long On":
-                                                    pattern.longOnPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
-                                                    break;
-                                                case "Color":
-                                                    pattern.colorPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
-                                                    break;
-                                                case "Fire":
-                                                    pattern.firePattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
-                                                    break;
-                                                case "RIT":
-                                                    pattern.ritPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
-                                                    break;
-                                                case "Cloudy Sky":
-                                                    pattern.cloudySkyPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
-                                                    break;
-                                                case "Grassy Green":
-                                                    pattern.grassyGreenPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
-                                                    break;
-                                                case "Lavender":
-                                                    pattern.lavenderPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
-                                                    break;
-                                                case "Bloody Red":
-                                                    pattern.bloodyRedPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
-                                                    break;
-                                                case "Spring Mist":
-                                                    pattern.springMistPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
-                                                    break;
+                                            String patternName= flashPattern;
+                                            if (patternName.equals("None")){
+                                                pattern.nonePattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
                                             }
-                                        }
+                                            if (patternName.equals("Short On")){
+                                                pattern.shortOnPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
+                                            }
+                                            if (patternName.equals("Long On")){
+                                                pattern.longOnPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
+                                            }
+                                            
+                                            if (patternName.equals("Color")){
+                                                pattern.colorPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
+                                            }
+                                            if (patternName.equals("Fire")){
+                                                pattern.firePattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
+                                            }
+                                            if (patternName.equals("RIT")){
+                                                pattern.ritPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
+                                            }
+                                            if (patternName.equals("Cloudy Sky")){
+                                                pattern.cloudySkyPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
+                                            }
+                                            if (patternName.equals( "Grassy Green")){
+                                                pattern.grassyGreenPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
+                                            }
+                                            if (patternName.equals("Lavender")){
+                                                pattern.lavenderPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
+                                            }
+                                            if (patternName.equals("Bloody Red")){
+                                                pattern.bloodyRedPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
+                                            }
+                                            if (patternName.equals("Spring Mist")){
+                                                pattern.springMistPattern(light, repeat, Long.valueOf(contact.getFlashRate()), colorXY);
+                                            }                                        }
                                     }
                                 }
 

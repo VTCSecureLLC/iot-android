@@ -79,16 +79,14 @@ public class MyChoices {
     }
 
     public int getHueValue(String color){
-        switch (color){
-            case "warm white": return 12750;
-            case "red" : return 0;
-            case "orange" : return 6375;
-            case "yellow" : return 12750;
-            case "green" : return 25500;
-            case "blue" : return 46920;
-            case "purple" : return 50100;
-            case "pink" : return 61100;
-        }
+            if(color.equals("warm white")) return 12750;
+             if(color.equals("red")) return 0;
+            if(color.equals( "orange" )) return 6375;
+            if(color.equals( "yellow" )) return 12750;
+            if(color.equals( "green" )) return 25500;
+            if(color.equals( "blue" )) return 46920;
+            if(color.equals( "purple")) return 50100;
+            if(color.equals( "pink" )) return 61100;
         return -1;
     }
 }

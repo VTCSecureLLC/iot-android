@@ -205,42 +205,40 @@ public class SetHueDefaultValuesActivity extends Activity {
                                 e.printStackTrace();
                             }
                             pattern.setPatternInterrupted(false);
-                            switch (patternName) {
-                                case "None":
-                                    pattern.nonePattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "Short On":
-                                    pattern.shortOnPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "Long On":
-                                    pattern.longOnPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "Color":
-                                    pattern.colorPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "Fire":
-                                    pattern.firePattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "RIT":
-                                    pattern.ritPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "Cloudy Sky":
-                                    pattern.cloudySkyPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "Grassy Green":
-                                    pattern.grassyGreenPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "Lavender":
-                                    pattern.lavenderPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "Bloody Red":
-                                    pattern.bloodyRedPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                                case "Spring Mist":
-                                    pattern.springMistPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
-                                    break;
-                            }
-                        }
+if (patternName.equals("None")){
+pattern.nonePattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
+}
+if (patternName.equals("Short On")){
+pattern.shortOnPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
+}
+if (patternName.equals("Long On")){
+pattern.longOnPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
+}
+
+if (patternName.equals("Color")){
+pattern.colorPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
+}
+if (patternName.equals("Fire")){
+pattern.firePattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
+}
+if (patternName.equals("RIT")){
+pattern.ritPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
+}
+if (patternName.equals("Cloudy Sky")){
+pattern.cloudySkyPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
+}
+if (patternName.equals( "Grassy Green")){
+pattern.grassyGreenPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
+}
+if (patternName.equals("Lavender")){
+pattern.lavenderPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
+}
+if (patternName.equals("Bloody Red")){
+pattern.bloodyRedPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
+}
+if (patternName.equals("Spring Mist")){
+pattern.springMistPattern(light, repeat, Long.valueOf(String.valueOf(flashRateValue.getText())), colorXY);
+}                        }
                     }
                 }
             }
