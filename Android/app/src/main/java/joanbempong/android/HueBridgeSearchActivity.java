@@ -257,6 +257,7 @@ public class HueBridgeSearchActivity extends Activity implements OnItemClickList
 
         PHBridge connectedBridge = phHueSDK.getSelectedBridge();
 
+
         if (connectedBridge != null) {
             String connectedIP = connectedBridge.getResourceCache().getBridgeConfiguration().getIpAddress();
             if (connectedIP != null) {   // We are already connected here:-

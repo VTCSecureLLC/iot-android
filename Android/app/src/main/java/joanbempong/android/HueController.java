@@ -458,13 +458,13 @@ public class HueController {
 
     public void startFlashing(final PHLight light){
         saveAllLightStates();
-        System.out.println(light.getName() + " should be flashing");
+        //System.out.println(light.getName() + " should be flashing");
         isFlashing = true;
         PHHueSDK phHueSDK = PHHueSDK.getInstance();
         final PHBridge bridge = phHueSDK.getSelectedBridge();
         List<PHLight> allLights = bridge.getResourceCache().getAllLights();
         for (final PHLight currentLight : allLights){
-            if ( light == null ||light.getName().equals(currentLight.getName())){
+            if (light == null|| ( light != null &&light.getName().equals(currentLight.getName()))){
                 (new Thread() {
                     public void run() {
                         Timer timer = new Timer();
