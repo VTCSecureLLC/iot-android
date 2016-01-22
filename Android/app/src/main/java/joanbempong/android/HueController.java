@@ -463,8 +463,8 @@ public class HueController {
         PHHueSDK phHueSDK = PHHueSDK.getInstance();
         final PHBridge bridge = phHueSDK.getSelectedBridge();
         List<PHLight> allLights = bridge.getResourceCache().getAllLights();
-        for (PHLight currentLight : allLights){
-            if (light.getName().equals(currentLight.getName())){
+        for (final PHLight currentLight : allLights){
+            if ( light == null ||light.getName().equals(currentLight.getName())){
                 (new Thread() {
                     public void run() {
                         Timer timer = new Timer();
@@ -474,10 +474,10 @@ public class HueController {
                                 while(isFlashing) {
                                     PHLightState state = new PHLightState();
                                     state.setOn(getToggle());
-                                    bridge.updateLightState(light, state);
+                                    bridge.updateLightState(currentLight, state);
                                     state.setBrightness(255);
-                                    bridge.updateLightState(light, state);
-                                    System.out.println(light.getName() + " is " + getToggle());
+                                    bridge.updateLightState(currentLight, state);
+                                    System.out.println(currentLight.getName() + " is " + getToggle());
                                     setToggle();
                                     //wait for half of a second before repeating
                                     sleepLength(500);
@@ -490,7 +490,6 @@ public class HueController {
             }
         }
     }
-
     public void stopFlashing(){
         System.out.println("no flashing");
         isFlashing = false;

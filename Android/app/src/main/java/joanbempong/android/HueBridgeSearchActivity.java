@@ -29,7 +29,7 @@ import java.util.List;
 
 public class HueBridgeSearchActivity extends Activity implements OnItemClickListener {
 
-    private PHHueSDK phHueSDK;
+    private static PHHueSDK phHueSDK;
     public static final String TAG = "ACENotification";
     private HueSharedPreferences prefs;
     private AccessPointListAdapter adapter;

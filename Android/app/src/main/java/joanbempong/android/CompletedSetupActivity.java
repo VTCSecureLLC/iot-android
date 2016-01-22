@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import org.linphone.LinphoneActivity;
 
 public class CompletedSetupActivity extends Activity {
 
@@ -31,7 +32,7 @@ public class CompletedSetupActivity extends Activity {
             SetupController setupController = SetupController.getInstance();
             setupController.setSetupCompleted(true);
             //navigate to the HomeActivity page
-            startActivity(new Intent(CompletedSetupActivity.this, HomeActivity.class));
+            startActivity(new Intent(CompletedSetupActivity.this, LinphoneActivity.class));
         }
     };
 
