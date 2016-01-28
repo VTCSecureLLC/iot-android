@@ -375,7 +375,8 @@ public class HueController {
         LightStates = new ArrayList<List<String>>();
         PHHueSDK phHueSDK = PHHueSDK.getInstance();
         PHBridge bridge = phHueSDK.getSelectedBridge();
-        List<PHLight> allLights = bridge.getResourceCache().getAllLights();
+        if(bridge!= null){
+            List<PHLight> allLights = bridge.getResourceCache().getAllLights();
         for (PHLight light : allLights){
             brightness = String.valueOf(light.getLastKnownLightState().getBrightness());
             isOn = String.valueOf(light.getLastKnownLightState().isOn());
@@ -399,12 +400,14 @@ public class HueController {
             LightStates.add(LightState);
         }
     }
+    }
 
     public void restoreAllLightStates(){
         totalCommands = 0;
         System.out.println("restoring all light states");
         PHHueSDK phHueSDK = PHHueSDK.getInstance();
         PHBridge bridge = phHueSDK.getSelectedBridge();
+        if(bridge!= null){
         List<PHLight> allLights = bridge.getResourceCache().getAllLights();
         for (List<String> lightState : LightStates) {
             innerLoop:
@@ -429,6 +432,7 @@ public class HueController {
                     break innerLoop;
                 }
             }
+        }
         }
     }
 
@@ -462,6 +466,7 @@ public class HueController {
         isFlashing = true;
         PHHueSDK phHueSDK = PHHueSDK.getInstance();
         final PHBridge bridge = phHueSDK.getSelectedBridge();
+        if(bridge !=null){
         List<PHLight> allLights = bridge.getResourceCache().getAllLights();
         for (final PHLight currentLight : allLights){
             if (light == null|| ( light != null &&light.getName().equals(currentLight.getName()))){
@@ -489,10 +494,13 @@ public class HueController {
                 }).start();
             }
         }
+        }
+
     }
     public void stopFlashing(){
         System.out.println("no flashing");
         isFlashing = false;
+        sleepLength(50);
         restoreAllLightStates();
     }
 
