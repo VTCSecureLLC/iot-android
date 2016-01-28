@@ -278,9 +278,10 @@ public class HueBridgeSearchActivity extends Activity implements OnItemClickList
 
     // Starting the main activity this way, prevents the PushLink Activity being shown when pressing the back button.
     public void startMainActivity() {
-        Intent intent = new Intent(getApplicationContext(), MoreLightsActivity.class);
+        Intent intent = new Intent(getApplicationContext(), LinphoneActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        SetupController.getInstance().setSetupCompleted(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
             intent.addFlags(0x8000); // equal to Intent.FLAG_ACTIVITY_CLEAR_TASK which is only available from API level 11
         startActivity(intent);
